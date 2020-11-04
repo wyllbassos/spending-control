@@ -1,0 +1,12 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "basedados",
+            "database": "${workspaceFolder:backend}/src/database/database.sqlite",
+            "group": "fr"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
+}
