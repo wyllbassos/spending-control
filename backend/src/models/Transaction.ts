@@ -8,6 +8,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import Category from './Category';
+import SubCategory from './SubCategory';
 import FormPayment from './FormPayment';
 
 @Entity('transactions')
@@ -36,7 +37,14 @@ class Transaction {
 
   @ManyToOne(() => FormPayment, formPayment => formPayment.transaction, { eager: true })
   @JoinColumn({ name: 'form_paynent_id' })
-  form_paynent: FormPayment;
+  formPaynent: FormPayment;
+
+  @Column()
+  sub_category_id: string;
+
+  @ManyToOne(() => SubCategory, subCategory => subCategory.transaction, { eager: true })
+  @JoinColumn({ name: 'sub_category_id' })
+  subCategory: Category;
 
   @CreateDateColumn()
   created_at: Date;

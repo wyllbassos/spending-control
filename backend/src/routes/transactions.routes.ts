@@ -3,30 +3,32 @@ import { getRepository } from 'typeorm';
 import multer from 'multer';
 
 import Category from '../models/Category';
+import SubCategory from '../models/SubCategory';
+import FormPayment from '../models/FormPayment';
 import Transaction from '../models/Transaction';
 import uploadConfig from '../config/upload';
 
 // import TransactionsRepository from '../repositories/TransactionsRepository';
-import CreateTransactionService from '../services/CreateTransactionService';
-import BalanceTransactionsService from '../services/BalanceTransactionsService';
-import DeleteTransactionService from '../services/DeleteTransactionService';
-import ImportTransactionsService from '../services/ImportTransactionsService';
+import CreateTransactionService from '../services/Transaction/CreateTransactionService';
+import BalanceTransactionsService from '../services/Transaction/Balance/BalanceTransactionsService';
+import DeleteTransactionService from '../services/Transaction/DeleteTransactionService';
+import ImportTransactionsService from '../services/Transaction/ImportTransactionsService';
 
 const transactionsRouter = Router();
 const upload = multer(uploadConfig);
 
 transactionsRouter.get('/', async (request: Request, response: Response) => {
-  const balanceTransactionsService = new BalanceTransactionsService();
   const transactionRepository = getRepository(Transaction);
 
-  const transactions = await transactionRepository.find();
-  const balance = await balanceTransactionsService.execute();
+  const transactions = await transactionRepository.find({
+    relations:['category', 'subCategory', 'formPaynent']
+  });
 
-  return response.json({ transactions, balance });
+  return response.json({ transactions });
 });
 
 transactionsRouter.post('/', async (request: Request, response: Response) => {
-  const { title, value, type, category } = request.body;
+  const { title, value, type, category, subCategory, formPayment } = request.body;
 
   const createTransactionService = new CreateTransactionService();
 
@@ -35,6 +37,8 @@ transactionsRouter.post('/', async (request: Request, response: Response) => {
     value,
     type,
     category,
+    subCategory,
+    formPayment,
   });
 
   const categoryRepository = getRepository(Category);
@@ -43,10 +47,26 @@ transactionsRouter.post('/', async (request: Request, response: Response) => {
     transactions.category_id,
   );
 
+  const subCategoryRepository = getRepository(SubCategory);
+
+  const transactionSubCategory = await subCategoryRepository.findOne(
+    transactions.sub_category_id,
+  );
+
+  const categoryFormPayment = getRepository(FormPayment);
+
+  const transactionFormPayment = await categoryFormPayment.findOne(
+    transactions.form_paynent_id,
+  );
+
   return response.json({
     ...transactions,
     category_id: undefined,
+    sub_category_id: undefined,
+    form_paynent_id: undefined,
     category: transactionCategory,
+    subCategory: transactionSubCategory,
+    formPayment: transactionFormPayment
   });
 });
 

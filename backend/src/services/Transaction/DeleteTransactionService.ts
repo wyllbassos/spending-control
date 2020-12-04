@@ -1,8 +1,8 @@
 import { getRepository } from 'typeorm';
 
-import Transaction from '../models/Transaction';
+import Transaction from '../../models/Transaction';
 
-import AppError from '../errors/AppError';
+import AppError from '../../errors/AppError';
 
 class DeleteTransactionService {
   public async execute({ id }: { id: string }): Promise<void> {

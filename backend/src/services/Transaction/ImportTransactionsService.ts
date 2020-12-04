@@ -2,10 +2,10 @@ import path from 'path';
 import fs from 'fs';
 import csvParse from 'csv-parse';
 
-import uploadConfig from '../config/upload';
-import AppError from '../errors/AppError';
+import uploadConfig from '../../config/upload';
+import AppError from '../../errors/AppError';
 
-import Transaction from '../models/Transaction';
+import Transaction from '../../models/Transaction';
 
 import CreateTransactionService from './CreateTransactionService';
 

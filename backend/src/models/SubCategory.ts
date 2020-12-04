@@ -8,15 +8,15 @@ import {
 } from 'typeorm';
 import Transaction from './Transaction';
 
-@Entity('form_payments')
-class FormPayment {
+@Entity('sub_categories')
+class SubCategory {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
   title: string;
 
-  @OneToMany(() => Transaction, transaction => transaction.formPaynent)
+  @OneToMany(() => Transaction, transaction => transaction.subCategory)
   transaction: Transaction;
 
   @CreateDateColumn()
@@ -26,4 +26,4 @@ class FormPayment {
   updated_at: Date;
 }
 
-export default FormPayment;
+export default SubCategory;

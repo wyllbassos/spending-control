@@ -38,6 +38,11 @@ export default class CreateTransactions1604879024928
             isNullable: true,
           },
           {
+            name: 'sub_category_id',
+            type: 'uuid',
+            isNullable: true,
+          },
+          {
             name: 'form_paynent_id',
             type: 'uuid',
             isNullable: true,
@@ -72,6 +77,17 @@ export default class CreateTransactions1604879024928
         name: 'FormPaymentTransaction',
         columnNames: ['form_paynent_id'],
         referencedTableName: 'form_payments',
+        referencedColumnNames: ['id'],
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+      }),
+    );
+    await queryRunner.createForeignKey(
+      'transactions',
+      new TableForeignKey({
+        name: 'SubCategoryTransaction',
+        columnNames: ['sub_category_id'],
+        referencedTableName: 'sub_categories',
         referencedColumnNames: ['id'],
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',

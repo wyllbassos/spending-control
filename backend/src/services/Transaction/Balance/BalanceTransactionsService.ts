@@ -1,6 +1,6 @@
 import { getRepository } from 'typeorm';
 
-import Transaction from '../models/Transaction';
+import Transaction from '../../../models/Transaction';
 
 interface Response {
   income: number;

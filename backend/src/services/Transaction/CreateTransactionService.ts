@@ -1,18 +1,22 @@
 import { getRepository } from 'typeorm';
 
-import AppError from '../errors/AppError';
-import Category from '../models/Category';
+import AppError from '../../errors/AppError';
+import Category from '../../models/Category';
 
-import Transaction from '../models/Transaction';
+import Transaction from '../../models/Transaction';
 
-import CreateCategoryService from './CreateCategoryService';
-import BalanceTransactionsService from './BalanceTransactionsService';
+import CreateCategoryService from '../Category/CreateCategoryService';
+import CreateFormPaymentService from '../FormPayment/CreateFormPaymentService';
+import CreateSubCategoryService from '../SubCategory/CreateSubCategoryService';
+import BalanceTransactionsService from './Balance/BalanceTransactionsService';
 
 interface Request {
   title: string;
   value: number;
   type: 'income' | 'outcome';
   category: string;
+  subCategory: string,
+  formPayment: string
 }
 
 function checkIfValueIsValid(value: number): void {
@@ -36,8 +40,7 @@ function checkIfValueIsValid(value: number): void {
 }
 
 function checkParms(
-  { title, type, value }: Omit<Request, 'category'>,
-  balance: number,
+  { title, type, value }: Request
 ): void {
   if (!title) {
     throw new AppError('The title field cannot be null');
@@ -48,25 +51,24 @@ function checkParms(
   }
 
   checkIfValueIsValid(value);
-
-  if (type === 'outcome' && value > balance) {
-    throw new AppError("The account don't have a balance to this transaction");
-  }
 }
 
 class CreateTransactionService {
-  public async execute({
-    title,
-    value,
-    type,
-    category,
-  }: Request): Promise<Transaction> {
+  public async execute(request: Request): Promise<Transaction> {
+    const {
+      title,
+      value,
+      type,
+      category,
+      subCategory,
+      formPayment
+    } = request;
     const transactionRepository = getRepository(Transaction);
     const balanceTransactionsService = new BalanceTransactionsService();
 
     const balance = (await balanceTransactionsService.execute()).total;
 
-    checkParms({ title, value, type }, balance);
+    checkParms(request);
 
     let categoryOfTransaction = new Category();
 
@@ -78,11 +80,33 @@ class CreateTransactionService {
       });
     }
 
+    let subCategoryOfTransaction = new Category();
+
+    if (subCategory) {
+      const createSubCategoryService = new CreateSubCategoryService();
+
+      subCategoryOfTransaction = await createSubCategoryService.execute({
+        title: subCategory,
+      });
+    }
+
+    let formPaymentOfTransaction = new Category();
+
+    if (formPayment) {
+      const createformPaymentService = new CreateFormPaymentService();
+
+      formPaymentOfTransaction = await createformPaymentService.execute({
+        title: formPayment,
+      });
+    }
+
     const transaction = transactionRepository.create({
       title,
       value,
       type,
       category_id: categoryOfTransaction.id,
+      sub_category_id: subCategoryOfTransaction.id,
+      form_paynent_id: formPaymentOfTransaction.id
     });
     console.log(balance, transaction);
     await transactionRepository.save(transaction);
