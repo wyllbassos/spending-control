@@ -3,12 +3,11 @@ import { shade } from 'polished';
 
 export const Container = styled.div`
   width: 100%;
-  max-width: 736px;
+  height: 100%;
+  overflow-y: auto;
+  max-width: 1120px;
   margin: 0 auto;
-  padding: 40px 20px;
-  @media (max-width: 1000px) {
-    max-width: 100%;
-  }
+  padding: 20px 20px 40px 20px;
 `;
 
 export const Title = styled.h1`
@@ -22,6 +21,7 @@ export const Title = styled.h1`
     font-size: 28px;
   }
 `;
+
 export const Form = styled.form`
   display: grid;
   margin-top: 20px;

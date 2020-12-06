@@ -10,7 +10,10 @@ export default createGlobalStyle`
 
   body {
     background: #F0F2F5 ;
-    -webkit-font-smoothing: antialiased
+    -webkit-font-smoothing: antialiased;
+    display: flex;
+    width: 100vw;
+    height: 100vh;
   }
 
   body, input, button {
@@ -21,7 +24,8 @@ export default createGlobalStyle`
     cursor: pointer;
   }
   #root{
-    width: 100%;
-    height: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
   }
 `;

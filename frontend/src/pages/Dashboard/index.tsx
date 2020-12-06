@@ -4,39 +4,48 @@ import api from '../../services/api';
 
 import Header from '../../components/Header';
 
-import { Container, CardContainer, TableContainer } from './styles';
-import Card from './Card';
+import { Container } from './styles';
+
 import Table from './Table';
 
-export interface Transaction {
-  id: string;
+interface ICategory {
   title: string;
-  value: number;
-  formattedValue: string;
-  formattedDate: string;
-  type: 'income' | 'outcome';
-  category: { title: string };
-  created_at: Date;
 }
 
-interface Balance {
-  income: string;
-  outcome: string;
-  total: string;
+interface ISubCategory {
+  title: string;
+}
+
+interface IPaymentMode {
+  title: string;
+}
+
+export interface ITransaction {
+  id: string,
+  title: string;
+  value: number;
+  type: 'income' | 'outcome';
+  category_id: string;
+  sub_category_id: string,
+  payment_mode_id: string,
+  date: string,
+  payment_date: string,
+  installment_number: number,
+  installment_total: number,
+  executed: boolean,
+  category: ICategory;
+  subCategory: ISubCategory,
+  paymentMode: IPaymentMode,
+  created_at: Date,
 }
 
 const Dashboard: React.FC = () => {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [balance, setBalance] = useState<Balance>({} as Balance);
+  const [transactions, setTransactions] = useState<ITransaction[]>([]);
 
   useEffect(() => {
     async function loadTransactions(): Promise<void> {
-      const response = await api.get<{
-        transactions: Transaction[];
-        balance: Balance;
-      }>('/transactions');
-      setBalance(response.data.balance);
-      setTransactions(response.data.transactions);
+      const response = await api.get<ITransaction[]>('/transactions');
+      setTransactions(response.data);
     }
 
     loadTransactions();
@@ -46,11 +55,6 @@ const Dashboard: React.FC = () => {
     <>
       <Header selected="/" />
       <Container>
-        <CardContainer>
-          <Card title="Entradas" type="income" value={balance.income} />
-          <Card title="Saídas" type="outcome" value={balance.outcome} />
-          <Card title="Total" type="total" value={balance.total} />
-        </CardContainer>
         <Table transactions={transactions} />
       </Container>
     </>

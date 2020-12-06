@@ -1,57 +1,21 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from 'react';
 
-import formatValue from '../../utils/formatValue';
+import { CardsContainer } from './styles';
 
-import { TableContainer } from './styles';
+import { ITransaction } from '.';
+import Card from './Card';
 
-import { Transaction } from '.';
-
-interface TableProps {
-  transactions: Transaction[];
+interface ICardsProps {
+  transactions: ITransaction[];
 }
 
-const Table: React.FC<TableProps> = (props: TableProps) => {
-  const { transactions } = props;
-
-  return (
-    <TableContainer>
-      <table>
-        <thead>
-          <tr>
-            <th>Título</th>
-            <th>Preço</th>
-            <th>Categoria</th>
-            <th>Data</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {transactions.map(transaction => {
-            const {
-              title,
-              type,
-              value,
-              created_at,
-              category,
-              id,
-            } = transaction;
-            const formatedCreateAt = new Date(created_at).toLocaleDateString();
-            const formatedValue =
-              (type === 'outcome' ? '- ' : '') + formatValue(Number(value));
-            return (
-              <tr key={id}>
-                <td className="title">{title}</td>
-                <td className={type}>{formatedValue}</td>
-                <td>{category.title}</td>
-                <td>{formatedCreateAt}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </TableContainer>
-  );
-};
+const Table: React.FC<ICardsProps> = ({ transactions }: ICardsProps) => (
+  <CardsContainer>
+    {transactions.map(transaction => (
+      <Card key={transaction.id} transaction={transaction} />
+    ))}
+  </CardsContainer>
+);
 
 export default Table;
