@@ -9,12 +9,18 @@ import {
 } from 'typeorm';
 import Category from './Category';
 import SubCategory from './SubCategory';
-import FormPayment from './FormPayment';
+import PaymentMode from './PaymentMode';
 
 @Entity('transactions')
 class Transaction {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column('date')
+  date: string;
+
+  @Column('date')
+  payment_date: string;
 
   @Column()
   title: string;
@@ -25,6 +31,15 @@ class Transaction {
   @Column('decimal')
   value: number;
 
+  @Column('int')
+  installment_number: number;
+
+  @Column('int')
+  installment_total: number;
+
+  @Column('boolean')
+  executed: boolean;
+
   @Column()
   category_id: string;
 
@@ -33,11 +48,11 @@ class Transaction {
   category: Category;
 
   @Column()
-  form_paynent_id: string;
+  payment_mode_id: string;
 
-  @ManyToOne(() => FormPayment, formPayment => formPayment.transaction, { eager: true })
-  @JoinColumn({ name: 'form_paynent_id' })
-  formPaynent: FormPayment;
+  @ManyToOne(() => PaymentMode, paymentMode => paymentMode.transaction, { eager: true })
+  @JoinColumn({ name: 'payment_mode_id' })
+  paymentMode: PaymentMode;
 
   @Column()
   sub_category_id: string;

@@ -24,6 +24,26 @@ export default class CreateTransactions1604879024928
             type: 'varchar',
           },
           {
+            name: 'date',
+            type: 'date',
+          },
+          {
+            name: 'payment_date',
+            type: 'date',
+          },
+          {
+            name: 'installment_number',
+            type: 'int',
+          },
+          {
+            name: 'installment_total',
+            type: 'int',
+          },
+          {
+            name: 'executed',
+            type: 'boolean',
+          },
+          {
             name: 'type',
             type: 'enum',
             enum: ['income', 'outcome'],
@@ -35,17 +55,14 @@ export default class CreateTransactions1604879024928
           {
             name: 'category_id',
             type: 'uuid',
-            isNullable: true,
           },
           {
             name: 'sub_category_id',
             type: 'uuid',
-            isNullable: true,
           },
           {
-            name: 'form_paynent_id',
+            name: 'payment_mode_id',
             type: 'uuid',
-            isNullable: true,
           },
           {
             name: 'created_at',
@@ -74,9 +91,9 @@ export default class CreateTransactions1604879024928
     await queryRunner.createForeignKey(
       'transactions',
       new TableForeignKey({
-        name: 'FormPaymentTransaction',
-        columnNames: ['form_paynent_id'],
-        referencedTableName: 'form_payments',
+        name: 'PaymentModeTransaction',
+        columnNames: ['payment_mode_id'],
+        referencedTableName: 'payment_modes',
         referencedColumnNames: ['id'],
         onDelete: 'SET NULL',
         onUpdate: 'CASCADE',

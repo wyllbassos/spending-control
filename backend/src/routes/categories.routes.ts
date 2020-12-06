@@ -14,7 +14,7 @@ categoriesRouter.get('/', async (request: Request, response: Response) => {
 
   const categories = await categoryRepository.find();
 
-  return response.json({ categories });
+  return response.json(categories);
 });
 
 categoriesRouter.post('/', async (request: Request, response: Response) => {
@@ -22,9 +22,9 @@ categoriesRouter.post('/', async (request: Request, response: Response) => {
 
   const createCategoryService = new CreateCategoryService();
 
-  const categories = await createCategoryService.execute({ title });
+  const categorie = await createCategoryService.execute({ title });
 
-  return response.json({ categories });
+  return response.json(categorie);
 });
 
 categoriesRouter.delete(

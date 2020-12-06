@@ -4,7 +4,7 @@ import multer from 'multer';
 
 import Category from '../models/Category';
 import SubCategory from '../models/SubCategory';
-import FormPayment from '../models/FormPayment';
+import PaymentMode from '../models/PaymentMode';
 import Transaction from '../models/Transaction';
 import uploadConfig from '../config/upload';
 
@@ -21,52 +21,69 @@ transactionsRouter.get('/', async (request: Request, response: Response) => {
   const transactionRepository = getRepository(Transaction);
 
   const transactions = await transactionRepository.find({
-    relations:['category', 'subCategory', 'formPaynent']
+    relations:['category', 'subCategory', 'paymentMode']
   });
 
-  return response.json({ transactions });
+  return response.json(transactions);
 });
 
 transactionsRouter.post('/', async (request: Request, response: Response) => {
-  const { title, value, type, category, subCategory, formPayment } = request.body;
-
-  const createTransactionService = new CreateTransactionService();
-
-  const transactions = await createTransactionService.execute({
+  const {
     title,
     value,
     type,
     category,
     subCategory,
-    formPayment,
+    paymentMode,
+    date,
+    payment_date,
+    installment_number,
+    installment_total,
+    executed,
+  } = request.body;
+
+  const createTransactionService = new CreateTransactionService();
+
+  const transaction = await createTransactionService.execute({
+    title,
+    value,
+    type,
+    category,
+    subCategory,
+    paymentMode,
+    date,
+    payment_date,
+    installment_number,
+    installment_total,
+    executed,
   });
 
   const categoryRepository = getRepository(Category);
 
   const transactionCategory = await categoryRepository.findOne(
-    transactions.category_id,
+    transaction.category_id,
   );
 
   const subCategoryRepository = getRepository(SubCategory);
 
   const transactionSubCategory = await subCategoryRepository.findOne(
-    transactions.sub_category_id,
+    transaction.sub_category_id,
   );
 
-  const categoryFormPayment = getRepository(FormPayment);
+  const paymentModeRepository = getRepository(PaymentMode);
 
-  const transactionFormPayment = await categoryFormPayment.findOne(
-    transactions.form_paynent_id,
+  const transactionPaymentMode = await paymentModeRepository.findOne(
+    transaction.payment_mode_id,
   );
 
   return response.json({
-    ...transactions,
+    ...transaction,
     category_id: undefined,
     sub_category_id: undefined,
-    form_paynent_id: undefined,
+    payment_mode_id: undefined,
     category: transactionCategory,
     subCategory: transactionSubCategory,
-    formPayment: transactionFormPayment
+    paymentMode: transactionPaymentMode
   });
 });
 
@@ -91,7 +108,7 @@ transactionsRouter.post(
     const transactions = await importTransactionsService.execute({
       importFilename: request.file.filename,
     });
-    return response.json({ transactions });
+    return response.json(transactions);
   },
 );
 

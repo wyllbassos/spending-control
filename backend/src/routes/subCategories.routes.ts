@@ -14,7 +14,7 @@ subCategoriesRouter.get('/', async (request: Request, response: Response) => {
 
   const subCategories = await subCategoryRepository.find();
 
-  return response.json({ subCategories });
+  return response.json(subCategories);
 });
 
 subCategoriesRouter.post('/', async (request: Request, response: Response) => {
@@ -22,9 +22,9 @@ subCategoriesRouter.post('/', async (request: Request, response: Response) => {
 
   const createSubCategoryService = new CreateSubCategoryService();
 
-  const subCategories = await createSubCategoryService.execute({ title });
+  const subCategorie = await createSubCategoryService.execute({ title });
 
-  return response.json({ subCategories });
+  return response.json(subCategorie);
 });
 
 subCategoriesRouter.delete(
