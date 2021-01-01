@@ -10,7 +10,7 @@ export const ItenContainer = styled.div<CardProps>`
   flex-direction: column;
   flex: 1;
 
-  label {
+  div {
     color: #969cb3;
   }
 
@@ -45,8 +45,6 @@ export const Container = styled.div`
   &.title {
     color: #363f5f;
   }
-
-
 `;
 
 const Title = styled.h1`

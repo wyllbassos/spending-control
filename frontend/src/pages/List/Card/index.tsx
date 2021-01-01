@@ -3,15 +3,15 @@ import React from 'react';
 
 import formatValue from '../../../utils/formatValue';
 
-import { ITransaction } from '../';
+import { Transaction } from '..';
 
 import { Container, ItenContainer } from './styles';
 
-interface ICardProps {
-  transaction: ITransaction;
+interface CardProps {
+  transaction: Transaction;
 }
 
-const Card: React.FC<ICardProps> = ({ transaction }: ICardProps) => {
+const Card: React.FC<CardProps> = ({ transaction }: CardProps) => {
   const {
     date,
     payment_date,
@@ -23,7 +23,7 @@ const Card: React.FC<ICardProps> = ({ transaction }: ICardProps) => {
     type,
     installment_number,
     installment_total,
-    executed
+    executed,
   } = transaction;
 
   const formatedDate = new Date(date).toLocaleDateString();
@@ -35,57 +35,60 @@ const Card: React.FC<ICardProps> = ({ transaction }: ICardProps) => {
     <Container>
       <section>
         <ItenContainer>
-          <label>
+          <div>
             Descrição:
             <span>{` ${title}`}</span>
-          </label>
+          </div>
         </ItenContainer>
       </section>
       <section>
         <ItenContainer>
-          <label>
+          <div>
             Data:
             <span>{` ${formatedDate}`}</span>
-          </label>
-          <label>
+          </div>
+          <div>
             Data Pag.:
             <span>{` ${formatedPaymentDate}`}</span>
-          </label>
-          <label>
+          </div>
+          <div>
             Situação:
-            <span className={executed ? 'income' : 'outcome'}>{` ${executed ? 'Pago' : 'Pendente'}`}</span>
-          </label>
+            <span className={executed ? 'income' : 'outcome'}>
+              {executed ? 'Pago' : 'Pendente'}
+            </span>
+          </div>
         </ItenContainer>
         <ItenContainer>
-          <label>
+          <div>
             Forma Pag.:
             <span>{` ${paymentMode.title}`}</span>
-          </label>
-          <label>
+          </div>
+          <div>
             Categoria:
             <span>{` ${category.title}`}</span>
-          </label>
+          </div>
         </ItenContainer>
         <ItenContainer>
-          <label>
+          <div>
             Valor:
             <span className={type}>{` ${formatedValue}`}</span>
-          </label>
-          <label>
+          </div>
+          <div>
             Sub Cat.:
             <span>{` ${subCategory.title}`}</span>
-          </label>
+          </div>
           {installment_total > 0 ? (
             <ItenContainer>
-              <label>
+              <div>
                 Parcela:
                 <span>{` ${installment_number} de ${installment_total}`}</span>
-              </label>
+              </div>
             </ItenContainer>
-          ) : <></>}
+          ) : (
+            <></>
+          )}
         </ItenContainer>
       </section>
-
     </Container>
   );
 };

@@ -1,5 +1,9 @@
 import styled from 'styled-components';
 
+interface CardProps {
+  total?: boolean;
+}
+
 export const Container = styled.div`
   width: 100%;
   height: 100%;
@@ -16,4 +20,9 @@ export const Container = styled.div`
 export const Title = styled.h1`
   font-size: 48px;
   color: #3a3a3a;
+`;
+
+export const CardsContainer = styled.section`
+  display: flex;
+  flex: 1;
 `;

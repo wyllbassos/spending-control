@@ -1,122 +1,67 @@
-/* eslint-disable jsx-a11y/label-has-associated-control */
-/* eslint-disable no-restricted-syntax */
-import React, { FormEvent, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
+import { FiBook } from 'react-icons/fi';
+import * as Yup from 'yup';
+import { useHistory } from 'react-router-dom';
+import { Container, Title } from './styles';
 
+import Input from '../../components/Input';
+import Button from '../../components/Button';
+import getValidationsErrors from '../../utils/getValidationsErrors';
 import Header from '../../components/Header';
-
-import { Container, Title, Form, ListError } from './styles';
-
 import api from '../../services/api';
 
-interface Transaction {
-  title: string;
-  type: 'income' | 'outcome';
-  value: number;
-  category: {
-    title: string;
-  };
+interface FormToRegisterDataProps {
+  titleDescription: string;
+  url: string;
 }
 
-const Import: React.FC = () => {
-  const [type, setType] = useState<string>('-');
+const FormToRegisterData: React.FC<FormToRegisterDataProps> = ({
+  titleDescription,
+  url,
+}: FormToRegisterDataProps) => {
+  const [error, setError] = useState('');
   const [title, setTitle] = useState('');
-  const [value, setValue] = useState(0);
-  const [category, setCategory] = useState('');
-  const [inputError, setInputError] = useState<string[]>([]);
 
-  async function submitTransaction(
-    event: FormEvent<HTMLFormElement>,
-  ): Promise<void> {
-    event.preventDefault();
-    const errors = [];
-    if (!(type === 'income' || type === 'outcome')) {
-      errors.push('O tipo está incorreto');
-    }
-    if (!title) {
-      errors.push('O título deve ser preenchido');
-    }
-    if (!value) {
-      errors.push('O Valor deve ser maior que 0');
-    }
-    if (!category) {
-      errors.push('A Categoria deve ser preenchida');
-    }
-    if (errors.length === 0) {
-      setInputError([]);
-      const response = await api.post<Transaction>('/transactions', {
-        type,
-        value,
-        title,
-        category,
-      });
-      setInputError([JSON.stringify(response.data)]);
-      setType('income');
-      setTitle('');
-      setValue(0);
-      setCategory('');
-    } else {
-      setInputError(errors);
-    }
-  }
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+      e.preventDefault();
+      setError('');
+      try {
+        const schema = Yup.object().shape({
+          title: Yup.string().required('Descrição obrigatória'),
+        });
+
+        await schema.validate({ title }, { abortEarly: false });
+
+        const response = await api.post(`/${url}`, { title });
+
+        // history.push('/');
+      } catch (errorYup) {
+        if (errorYup instanceof Yup.ValidationError) {
+          const errors = getValidationsErrors(errorYup);
+          setError(errors.title);
+        }
+      }
+    },
+    [title, url],
+  );
 
   return (
     <>
-      <Header size="small" selected="/insert" />
-      <Container>
-        <Title>Inserir Movimentação</Title>
-        <Form onSubmit={submitTransaction}>
-          <div>
-            <label htmlFor="type">Tipo</label>
-            <select
-              name="type"
-              value={type}
-              onChange={e => setType(e.target.value)}
-            >
-              <option value="-">-</option>
-              <option value="income">Entrada</option>
-              <option value="outcome">Saída</option>
-            </select>
-          </div>
-          <div>
-            <label htmlFor="title">Título</label>
-            <input
-              type="text"
-              name="title"
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-            />
-          </div>
-          <div>
-            <label htmlFor="value">Valor</label>
-            <input
-              type="number"
-              min={0}
-              name="value"
-              value={value}
-              onChange={e => setValue(Number(e.target.value))}
-            />
-          </div>
-          <div>
-            <label htmlFor="category">Categoria</label>
-            <input
-              type="text"
-              name="category"
-              value={category}
-              onChange={e => setCategory(e.target.value)}
-            />
-          </div>
-          {inputError.length > 0 && (
-            <ListError>
-              {inputError.map(error => (
-                <li key={error}>{error}</li>
-              ))}
-            </ListError>
-          )}
-          <button type="submit">Salvar</button>
-        </Form>
-      </Container>
+      <Title>{`Cadastrar - ${titleDescription}`}</Title>
+      <form onSubmit={handleSubmit}>
+        <Input
+          value={title}
+          onChange={e => setTitle(e.target.value)}
+          error={error}
+          icon={FiBook}
+          placeholder={`Descrição da ${titleDescription}`}
+        />
+
+        <Button type="submit">Cadastrar</Button>
+      </form>
     </>
   );
 };
 
-export default Import;
+export default FormToRegisterData;

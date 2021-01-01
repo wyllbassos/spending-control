@@ -22,13 +22,19 @@ const Header: React.FC<HeaderProps> = ({
       <img src={Logo} alt="GoFinances" />
       <nav>
         <Link to="/" className={selected === '/' ? 'headerNavLinkSelect' : ''}>
+          Inicio
+        </Link>
+        <Link
+          to="/list"
+          className={selected === '/list' ? 'headerNavLinkSelect' : ''}
+        >
           Listagem
         </Link>
         <Link
-          to="/insert"
-          className={selected === '/insert' ? 'headerNavLinkSelect' : ''}
+          to="/registration"
+          className={selected === '/registration' ? 'headerNavLinkSelect' : ''}
         >
-          Inserir
+          Cadastros
         </Link>
       </nav>
     </header>

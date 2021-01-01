@@ -3,14 +3,14 @@ import React from 'react';
 
 import { CardsContainer } from './styles';
 
-import { ITransaction } from '.';
+import { Transaction } from '.';
 import Card from './Card';
 
-interface ICardsProps {
-  transactions: ITransaction[];
+interface CardsProps {
+  transactions: Transaction[];
 }
 
-const Table: React.FC<ICardsProps> = ({ transactions }: ICardsProps) => (
+const Table: React.FC<CardsProps> = ({ transactions }: CardsProps) => (
   <CardsContainer>
     {transactions.map(transaction => (
       <Card key={transaction.id} transaction={transaction} />
