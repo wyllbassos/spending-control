@@ -6,6 +6,7 @@ import Category from '../models/Category';
 // import CategorysRepository from '../repositories/CategorysRepository';
 import CreateCategoryService from '../services/Category/CreateCategoryService';
 import DeleteCategoryService from '../services/Category/DeleteCategoryService';
+import UpdateCategoryService from '../services/Category/UpdateCategoryService';
 
 const categoriesRouter = Router();
 
@@ -22,9 +23,9 @@ categoriesRouter.post('/', async (request: Request, response: Response) => {
 
   const createCategoryService = new CreateCategoryService();
 
-  const categorie = await createCategoryService.execute({ title });
+  const category = await createCategoryService.execute({ title });
 
-  return response.json(categorie);
+  return response.json(category);
 });
 
 categoriesRouter.delete(
@@ -37,6 +38,20 @@ categoriesRouter.delete(
     await deleteCategoryService.execute({ id });
 
     return response.json();
+  },
+);
+
+categoriesRouter.put(
+  '/:id',
+  async (request: Request, response: Response) => {
+    const { id } = request.params;
+    const { title } = request.body;
+
+    const updateCategoryService = new UpdateCategoryService();
+
+    const category = await updateCategoryService.execute({ id, title });
+
+    return response.json(category);
   },
 );
 

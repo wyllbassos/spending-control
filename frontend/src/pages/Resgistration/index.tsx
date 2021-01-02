@@ -1,69 +1,45 @@
-import React, { useState, useEffect, useCallback } from 'react';
-
-import { Link } from 'react-router-dom';
-import api from '../../services/api';
-import ListRegisters from './ListRegisters';
+import React, { useState, useEffect } from 'react';
 
 import Header from '../../components/Header';
 
-import { Container } from './styles';
-import FormToRegisterData from '../Insert';
+import ButtonsSelectRegister from './ButtonsSelectRegister';
 
-interface RegisterSelect {
-  titleDescription: string;
-  url: string;
+import { Container } from './styles';
+import FormToInsertRegister from './FormToInsertRegister';
+import ListRegisters from './ListRegister';
+import api from '../../services/api';
+
+export interface Register {
+  title: string;
+  id: string;
 }
 
 const Registration: React.FC = () => {
   const [titleDescription, setTitleDescription] = useState('Sub Categoria');
   const [url, setUrl] = useState('sub-categories');
-  const handleSetRegisterSelect = useCallback((data: RegisterSelect) => {
-    setTitleDescription(data.titleDescription);
-    setUrl(data.url);
-  }, []);
+  const [reload, setReload] = useState(false);
+  const [registers, setRegisters] = useState<Register[]>([]);
+
+  useEffect(() => {
+    api.get<Register[]>(url).then(response => {
+      const { data } = response;
+      setRegisters(data);
+    });
+  }, [url, reload]);
+
   return (
     <>
       <Header selected="/registration" />
       <Container>
-        <div>
-          <button
-            type="button"
-            onClick={() => {
-              handleSetRegisterSelect({
-                titleDescription: 'Sub Categoria',
-                url: 'sub-categories',
-              });
-            }}
-          >
-            Sub Categoria
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              handleSetRegisterSelect({
-                titleDescription: 'Categoria',
-                url: 'categories',
-              });
-            }}
-          >
-            Categoria
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              handleSetRegisterSelect({
-                titleDescription: 'Forma de Pagamento',
-                url: 'payment-modes',
-              });
-            }}
-          >
-            Forma de Pagamento
-          </button>
-        </div>
-        {titleDescription && url && (
-          <FormToRegisterData titleDescription={titleDescription} url={url} />
-        )}
-        <ListRegisters url={url} />
+        <ButtonsSelectRegister
+          data={{ setTitleDescription, setUrl, titleDescription }}
+        />
+
+        <FormToInsertRegister
+          data={{ titleDescription, url, setReload, reload }}
+        />
+
+        <ListRegisters data={{ registers, url, setReload, reload }} />
       </Container>
     </>
   );

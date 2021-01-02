@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from 'react';
 
-import { CardsContainer } from './styles';
+import { Container } from './styles';
 
-import { Transaction } from '.';
+import { Transaction } from '..';
 import Card from './Card';
 
 interface CardsProps {
@@ -11,11 +11,11 @@ interface CardsProps {
 }
 
 const Table: React.FC<CardsProps> = ({ transactions }: CardsProps) => (
-  <CardsContainer>
+  <Container>
     {transactions.map(transaction => (
       <Card key={transaction.id} transaction={transaction} />
     ))}
-  </CardsContainer>
+  </Container>
 );
 
 export default Table;

@@ -6,6 +6,7 @@ import SubCategory from '../models/SubCategory';
 // import SubCategorysRepository from '../repositories/SubCategorysRepository';
 import CreateSubCategoryService from '../services/SubCategory/CreateSubCategoryService';
 import DeleteSubCategoryService from '../services/SubCategory/DeleteSubCategoryService';
+import UpdateSubCategoryService from '../services/SubCategory/UpdateSubCategoryService';
 
 const subCategoriesRouter = Router();
 
@@ -22,9 +23,9 @@ subCategoriesRouter.post('/', async (request: Request, response: Response) => {
 
   const createSubCategoryService = new CreateSubCategoryService();
 
-  const subCategorie = await createSubCategoryService.execute({ title });
+  const subCategory = await createSubCategoryService.execute({ title });
 
-  return response.json(subCategorie);
+  return response.json(subCategory);
 });
 
 subCategoriesRouter.delete(
@@ -37,6 +38,20 @@ subCategoriesRouter.delete(
     await deleteSubCategoryService.execute({ id });
 
     return response.json();
+  },
+);
+
+subCategoriesRouter.put(
+  '/:id',
+  async (request: Request, response: Response) => {
+    const { id } = request.params;
+    const { title } = request.body;
+
+    const updateSubCategoryService = new UpdateSubCategoryService();
+
+    const subCategory = await updateSubCategoryService.execute({ id, title });
+
+    return response.json(subCategory);
   },
 );
 

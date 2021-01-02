@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/camelcase */
 import React from 'react';
 
-import formatValue from '../../../utils/formatValue';
+import formatValue from '../../../../utils/formatValue';
 
-import { Transaction } from '..';
+import { Transaction } from '../..';
 
 import { Container, ItenContainer } from './styles';
 

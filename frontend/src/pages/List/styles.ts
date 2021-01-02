@@ -16,13 +16,3 @@ export const Container = styled.div`
     padding: 10px 10px;
   }
 `;
-
-export const Title = styled.h1`
-  font-size: 48px;
-  color: #3a3a3a;
-`;
-
-export const CardsContainer = styled.section`
-  display: flex;
-  flex: 1;
-`;

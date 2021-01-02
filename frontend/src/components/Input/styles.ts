@@ -8,7 +8,7 @@ interface ContainerProps {
 }
 
 export const Container = styled.div<ContainerProps>`
-  background: #232129;
+  background: #5636d3;
   border-radius: 10px;
   padding: 16px;
   width: 100%;
@@ -47,6 +47,10 @@ export const Container = styled.div<ContainerProps>`
     background: transparent;
     border: 0;
     color: #f4ede8;
+
+    @media (max-width: 1000px) {
+      font-size: 12px;
+    }
 
     &::placeholder {
       color: #666360;

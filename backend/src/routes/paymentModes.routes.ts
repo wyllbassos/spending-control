@@ -6,6 +6,7 @@ import PaymentMode from '../models/PaymentMode';
 // import PaymentModesRepository from '../repositories/PaymentModesRepository';
 import CreatePaymentModeService from '../services/PaymentMode/CreatePaymentModeService';
 import DeletePaymentModeService from '../services/PaymentMode/DeletePaymentModeService';
+import UpdatePaymentModeService from '../services/PaymentMode/UpdatePaymentModeService';
 
 const paymentModesRouter = Router();
 
@@ -37,6 +38,20 @@ paymentModesRouter.delete(
     await deletePaymentModeService.execute({ id });
 
     return response.json();
+  },
+);
+
+paymentModesRouter.put(
+  '/:id',
+  async (request: Request, response: Response) => {
+    const { id } = request.params;
+    const { title } = request.body;
+
+    const updatePaymentModeService = new UpdatePaymentModeService();
+
+    const paymentMode = await updatePaymentModeService.execute({ id, title });
+
+    return response.json(paymentMode);
   },
 );
 
