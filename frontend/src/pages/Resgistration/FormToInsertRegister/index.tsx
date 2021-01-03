@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { FiBook } from 'react-icons/fi';
 import * as Yup from 'yup';
-import { Container, Title } from './styles';
+import { Container } from './styles';
 
 import Input from '../../../components/Input';
 import Button from '../../../components/Button';
@@ -12,13 +12,29 @@ const FormToInsertRegister: React.FC = () => {
   const [error, setError] = useState('');
 
   const {
-    titleDescription,
     title,
     setTitle,
     insertRegister,
     updating,
+    deleting,
     updateRegister,
+    deleteRegister,
+    resetValues,
+    registers,
+    indexRegister,
   } = useRegister();
+
+  const registerDescription = registers[indexRegister].description;
+
+  const buttonDescription = useCallback(() => {
+    if (updating) {
+      return `Atualizar - ${registerDescription}`;
+    }
+    if (deleting) {
+      return `Deletar - ${registerDescription}`;
+    }
+    return `Cadastrar - ${registerDescription}`;
+  }, [updating, deleting, registerDescription]);
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
@@ -34,6 +50,8 @@ const FormToInsertRegister: React.FC = () => {
         // const response = await api.post(`/${url}`, { title });
         if (updating) {
           await updateRegister();
+        } else if (deleting) {
+          await deleteRegister();
         } else {
           await insertRegister();
         }
@@ -45,22 +63,30 @@ const FormToInsertRegister: React.FC = () => {
         }
       }
     },
-    [title, insertRegister, updateRegister, updating],
+    [title, insertRegister, updateRegister, updating, deleteRegister, deleting],
   );
 
   return (
     <>
-      <Title>{`Cadastrar - ${titleDescription}`}</Title>
       <Container onSubmit={handleSubmit}>
         <Input
           value={title}
           onChange={e => setTitle(e.target.value)}
           error={error}
           icon={FiBook}
-          placeholder={`Descrição da ${titleDescription}`}
+          placeholder={`Descrição da ${registerDescription}`}
         />
 
-        <Button type="submit">{updating ? 'Atualizar' : 'Cadastrar'}</Button>
+        <Button type="submit">{buttonDescription()}</Button>
+        {(updating || deleting) && (
+          <Button
+            type="button"
+            style={{ backgroundColor: 'red' }}
+            onClick={() => resetValues()}
+          >
+            Cancelar
+          </Button>
+        )}
       </Container>
     </>
   );

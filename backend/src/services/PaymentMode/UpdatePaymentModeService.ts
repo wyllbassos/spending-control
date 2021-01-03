@@ -28,6 +28,9 @@ class UpdatePaymentModeService {
     });
 
     if (checkExistsPaymentModeTitle) {
+      if (checkExistsPaymentModeTitle.id === id) {
+        return checkExistsPaymentModeTitle;
+      }
       throw new AppError('This paymentMode title is alredy used');
     }
 

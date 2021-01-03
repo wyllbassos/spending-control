@@ -6,7 +6,7 @@ import ButtonsSelectRegister from './ButtonsSelectRegister';
 
 import { Container } from './styles';
 import FormToInsertRegister from './FormToInsertRegister';
-import ListRegisters from './ListRegister';
+import ListRecords from './ListRecords';
 import RegistersProvider from './hooks';
 
 export interface Register {
@@ -23,7 +23,7 @@ const Registration: React.FC = () => {
 
         <FormToInsertRegister />
 
-        <ListRegisters />
+        <ListRecords />
       </Container>
     </RegistersProvider>
   );

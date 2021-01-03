@@ -28,6 +28,9 @@ class UpdateCategoryService {
     });
 
     if (checkExistsCategoryTitle) {
+      if (checkExistsCategoryTitle.id === id) {
+        return checkExistsCategoryTitle
+      }
       throw new AppError('This category title is alredy used');
     }
 

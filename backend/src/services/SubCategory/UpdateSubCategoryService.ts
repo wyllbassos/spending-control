@@ -28,6 +28,9 @@ class UpdateSubCategoryService {
     });
 
     if (checkExistsSubCategoryTitle) {
+      if (checkExistsSubCategoryTitle.id === id) {
+        return checkExistsSubCategoryTitle;
+      }
       throw new AppError('This subCategory title is alredy used');
     }
 
