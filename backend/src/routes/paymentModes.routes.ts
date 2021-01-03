@@ -13,7 +13,9 @@ const paymentModesRouter = Router();
 paymentModesRouter.get('/', async (request: Request, response: Response) => {
   const paymentModeRepository = getRepository(PaymentMode);
 
-  const paymentModes = await paymentModeRepository.find();
+  const paymentModes = await paymentModeRepository.find({
+    order: { title: 'ASC' }
+  });
 
   return response.json(paymentModes);
 });

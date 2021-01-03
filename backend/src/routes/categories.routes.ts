@@ -13,7 +13,7 @@ const categoriesRouter = Router();
 categoriesRouter.get('/', async (request: Request, response: Response) => {
   const categoryRepository = getRepository(Category);
 
-  const categories = await categoryRepository.find();
+  const categories = await categoryRepository.find({ order: { title: 'ASC' } });
 
   return response.json(categories);
 });

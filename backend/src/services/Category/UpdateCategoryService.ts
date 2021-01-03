@@ -23,7 +23,9 @@ class UpdateCategoryService {
       throw new AppError("The title field cannot be null");
     }
 
-    const checkExistsCategoryTitle = await categoryRepository.findOne(title);
+    const checkExistsCategoryTitle = await categoryRepository.findOne({
+      where: { title }
+    });
 
     if (checkExistsCategoryTitle) {
       throw new AppError('This category title is alredy used');

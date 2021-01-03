@@ -1,37 +1,18 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { FiEdit, FiTrash2 } from 'react-icons/fi';
-import { Register } from '..';
-import api from '../../../services/api';
+import { useRegister } from '../hooks/register';
 
 import { Container } from './styles';
 
-interface Request {
-  data: {
-    registers: Register[];
-    url: string;
-    setReload: React.Dispatch<React.SetStateAction<boolean>>;
-    reload: boolean;
-  };
-}
+const ListRegisters: React.FC = () => {
+  const {
+    registers,
+    deleteRegister,
+    setUpdating,
+    setTitle,
+    setId,
+  } = useRegister();
 
-const ListRegisters: React.FC<Request> = ({
-  data: { registers, url, setReload, reload },
-}: Request) => {
-  const handleDeleteRegister = useCallback(
-    async (id: string): Promise<void> => {
-      api
-        .delete(`${url}/${id}`)
-        .then(() => {
-          setReload(!reload);
-        })
-        .catch(error => {
-          if (error.response.data.message) {
-            alert(error.response.data.message);
-          }
-        });
-    },
-    [url, reload, setReload],
-  );
   return (
     <Container>
       <li>
@@ -42,12 +23,14 @@ const ListRegisters: React.FC<Request> = ({
           <li key={register.id}>
             <FiEdit
               onClick={() => {
-                console.log('edit', url, register.id);
+                setUpdating(true);
+                setTitle(register.title);
+                setId(register.id);
               }}
             />
             <FiTrash2
               onClick={() => {
-                handleDeleteRegister(register.id);
+                deleteRegister(register.id);
               }}
             />
             <span>{register.title}</span>

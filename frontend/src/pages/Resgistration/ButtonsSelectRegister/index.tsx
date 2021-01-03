@@ -1,19 +1,9 @@
 import React, { useCallback } from 'react';
-// import { FiBook } from 'react-icons/fi';
-// import { useHistory } from 'react-router-dom';
+import { useRegister } from '../hooks/register';
 import { Container } from './styles';
 
-interface RegisterSelect {
-  data: {
-    titleDescription: string;
-    setTitleDescription: React.Dispatch<React.SetStateAction<string>>;
-    setUrl: React.Dispatch<React.SetStateAction<string>>;
-  };
-}
-
-const ButtonsSelectRegister: React.FC<RegisterSelect> = ({
-  data: { setTitleDescription, setUrl, titleDescription },
-}: RegisterSelect) => {
+const ButtonsSelectRegister: React.FC = () => {
+  const { setTitleDescription, setUrl, titleDescription } = useRegister();
   const handleSetRegisterSelect = useCallback(
     (newTitle: string, url: string) => {
       setTitleDescription(newTitle);

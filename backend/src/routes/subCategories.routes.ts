@@ -13,7 +13,9 @@ const subCategoriesRouter = Router();
 subCategoriesRouter.get('/', async (request: Request, response: Response) => {
   const subCategoryRepository = getRepository(SubCategory);
 
-  const subCategories = await subCategoryRepository.find();
+  const subCategories = await subCategoryRepository.find({
+    order: { title: 'ASC' }
+  });
 
   return response.json(subCategories);
 });

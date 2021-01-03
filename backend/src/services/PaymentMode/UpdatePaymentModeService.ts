@@ -23,7 +23,9 @@ class UpdatePaymentModeService {
       throw new AppError("The title field cannot be null");
     }
 
-    const checkExistsPaymentModeTitle = await paymentModeRepository.findOne(title);
+    const checkExistsPaymentModeTitle = await paymentModeRepository.findOne({
+      where: { title }
+    });
 
     if (checkExistsPaymentModeTitle) {
       throw new AppError('This paymentMode title is alredy used');
