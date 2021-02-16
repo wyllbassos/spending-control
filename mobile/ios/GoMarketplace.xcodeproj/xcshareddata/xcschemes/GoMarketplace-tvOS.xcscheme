@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-               BuildableName = "GoMarketplace-tvOS.app"
-               BlueprintName = "GoMarketplace-tvOS"
-               ReferencedContainer = "container:GoMarketplace.xcodeproj">
+               BuildableName = "gofinances-tvOS.app"
+               BlueprintName = "gofinances-tvOS"
+               ReferencedContainer = "container:gofinances.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "2D02E48F1E0B4A5D006451C7"
-               BuildableName = "GoMarketplace-tvOSTests.xctest"
-               BlueprintName = "GoMarketplace-tvOSTests"
-               ReferencedContainer = "container:GoMarketplace.xcodeproj">
+               BuildableName = "gofinances-tvOSTests.xctest"
+               BlueprintName = "gofinances-tvOSTests"
+               ReferencedContainer = "container:gofinances.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-            BuildableName = "GoMarketplace-tvOS.app"
-            BlueprintName = "GoMarketplace-tvOS"
-            ReferencedContainer = "container:GoMarketplace.xcodeproj">
+            BuildableName = "gofinances-tvOS.app"
+            BlueprintName = "gofinances-tvOS"
+            ReferencedContainer = "container:gofinances.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "2D02E47A1E0B4A5D006451C7"
-            BuildableName = "GoMarketplace-tvOS.app"
-            BlueprintName = "GoMarketplace-tvOS"
-            ReferencedContainer = "container:GoMarketplace.xcodeproj">
+            BuildableName = "gofinances-tvOS.app"
+            BlueprintName = "gofinances-tvOS"
+            ReferencedContainer = "container:gofinances.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

@@ -32,7 +32,7 @@ const CartProvider: React.FC = ({ children }) => {
     async function loadProducts(): Promise<void> {
       // TODO LOAD ITEMS FROM ASYNC STORAGE
       const storageProducts = await AsyncStorage.getItem(
-        'GoMarketPlace@products',
+        'gofinances@products',
       );
       if (storageProducts) {
         setProducts(JSON.parse(storageProducts));
@@ -55,7 +55,7 @@ const CartProvider: React.FC = ({ children }) => {
       });
       setProducts(newProducts);
       await AsyncStorage.setItem(
-        'GoMarketPlace@products',
+        'gofinances@products',
         JSON.stringify(newProducts),
       );
     },
@@ -75,7 +75,7 @@ const CartProvider: React.FC = ({ children }) => {
         newProducts.push({ ...newProduct, quantity: 1 });
         setProducts(newProducts);
         await AsyncStorage.setItem(
-          'GoMarketPlace@products',
+          'gofinances@products',
           JSON.stringify(newProducts),
         );
       }
@@ -103,7 +103,7 @@ const CartProvider: React.FC = ({ children }) => {
       }
       setProducts(newProducts);
       await AsyncStorage.setItem(
-        'GoMarketPlace@products',
+        'gofinances@products',
         JSON.stringify(newProducts),
       );
     },
