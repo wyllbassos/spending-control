@@ -1,5 +1,5 @@
 {
-  "name": "GoMarketplace",
+  "name": "gofinances",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -19,8 +19,8 @@
     "express": "^4.17.1",
     "intl": "^1.2.5",
     "json-server": "^0.16.1",
-    "react": "16.11.0",
-    "react-native": "0.62.2",
+    "react": "16.13.1",
+    "react-native": "0.63.4",
     "react-native-gesture-handler": "^1.6.1",
     "react-native-iphone-x-helper": "^1.2.1",
     "react-native-reanimated": "^1.8.0",
