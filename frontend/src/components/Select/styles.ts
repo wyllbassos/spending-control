@@ -42,19 +42,20 @@ export const Container = styled.div<ContainerProps>`
     margin-top: 8px;
   }
 
-  input {
+  select {
     flex: 1;
     background: transparent;
     border: 0;
     color: #f4ede8;
     height: 40px;
 
-    @media (max-width: 1000px) {
-      font-size: 16px;
+    option {
+      background-color: #5636d3;
+      padding: 16px;
     }
 
-    &::placeholder {
-      color: #666360;
+    @media (max-width: 1000px) {
+      font-size: 16px;
     }
   }
   svg {

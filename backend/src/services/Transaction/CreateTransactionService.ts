@@ -14,13 +14,13 @@ interface Request {
   value: number;
   type: 'income' | 'outcome';
   category: string;
-  subCategory: string,
-  paymentMode: string,
-  date: string,
-  payment_date: string,
-  installment_number: number,
-  installment_total: number,
-  executed: boolean,
+  subCategory: string;
+  paymentMode: string;
+  date: string;
+  payment_date: string;
+  installment_number: number;
+  installment_total: number;
+  executed: boolean;
 }
 
 function checkIfValueIsValid(value: number, field: string): void {
@@ -90,9 +90,9 @@ function checkParms({
 
   checkIfValueIsValid(installment_total, 'installment_total');
 
-  if(installment_number > installment_total) {
+  if (installment_number > installment_total) {
     throw new AppError(
-      `The installment_number field cannot be greater than the installment_total field`
+      `The installment_number field cannot be greater than the installment_total field`,
     );
   }
 }
@@ -131,7 +131,6 @@ class CreateTransactionService {
       title: paymentMode,
     });
 
-
     const transaction = transactionRepository.create({
       title,
       value,
@@ -140,10 +139,10 @@ class CreateTransactionService {
       payment_date,
       installment_number,
       installment_total,
-      executed,
+      executed: executed ? true : false,
       category_id: categoryOfTransaction.id,
       sub_category_id: subCategoryOfTransaction.id,
-      payment_mode_id: paymentModeOfTransaction.id
+      payment_mode_id: paymentModeOfTransaction.id,
     });
 
     await transactionRepository.save(transaction);

@@ -1,5 +1,5 @@
 import React, {
-  InputHTMLAttributes,
+  SelectHTMLAttributes,
   useCallback,
   useRef,
   useState,
@@ -9,32 +9,40 @@ import { FiAlertCircle } from 'react-icons/fi';
 
 import { Container, Error } from './styles';
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+interface Options {
+  value: string | number;
+  text: string;
+}
+
+interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   icon?: React.ComponentType<IconBaseProps>;
   error?: string;
   defaultValue?: any;
+  options?: Options[];
   label?: string;
 }
 
-const Input: React.FC<InputProps> = ({
+const Select: React.FC<SelectProps> = ({
   label,
   icon: Icon,
   error,
   defaultValue,
+  options,
+  children,
   ...rest
-}: InputProps) => {
-  const inputRef = useRef<HTMLInputElement>(null);
+}: SelectProps) => {
+  const selectRef = useRef<HTMLSelectElement>(null);
   // const { fieldName, defaultValue, error, registerField } = useField(name);
   const [isFocused, setIsFocused] = useState(false);
   const [isFilled, setIsFilled] = useState(false);
 
-  const handleInputBlur = useCallback(() => {
+  const handleSelectBlur = useCallback(() => {
     setIsFocused(false);
 
-    setIsFilled(!!inputRef.current?.value);
+    setIsFilled(!!selectRef.current?.value);
   }, []);
 
-  const handleInputFocus = useCallback(() => {
+  const handleSelectFocus = useCallback(() => {
     setIsFocused(true);
   }, []);
 
@@ -44,13 +52,21 @@ const Input: React.FC<InputProps> = ({
       {label && <span>{label}</span>}
       <Container isErrored={!!error} isFocused={isFocused} isFilled={isFilled}>
         {Icon && <Icon size={20} />}
-        <input
-          onFocus={handleInputFocus}
-          onBlur={handleInputBlur}
+        <select
+          onFocus={handleSelectFocus}
+          onBlur={handleSelectBlur}
           defaultValue={defaultValue}
-          ref={inputRef}
+          ref={selectRef}
           {...rest}
-        />
+        >
+          {options &&
+            options.map(option => (
+              <option key={option.text} value={option.value}>
+                {option.text}
+              </option>
+            ))}
+          {children}
+        </select>
         {error && (
           <Error title={error}>
             <FiAlertCircle color="#c53030" size={20} />
@@ -61,4 +77,4 @@ const Input: React.FC<InputProps> = ({
   );
 };
 
-export default Input;
+export default Select;

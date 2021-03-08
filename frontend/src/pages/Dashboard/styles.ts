@@ -11,9 +11,10 @@ export const Container = styled.div`
   max-width: 1120px;
   margin: 0 auto;
   padding: 20px 20px 40px 20px;
+  overflow-y: auto;
 
   @media (max-width: 1000px) {
-    padding: 10px 10px;
+    padding: 15px;
   }
 `;
 
