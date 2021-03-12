@@ -6,7 +6,7 @@ import AppError from '../../errors/AppError';
 
 interface Request {
   id: string;
-  title: string
+  title: string;
 }
 
 class UpdatePaymentModeService {
@@ -19,12 +19,12 @@ class UpdatePaymentModeService {
       throw new AppError('Id invalid');
     }
 
-    if(!title) {
-      throw new AppError("The title field cannot be null");
+    if (!title) {
+      throw new AppError('The title field cannot be null');
     }
 
     const checkExistsPaymentModeTitle = await paymentModeRepository.findOne({
-      where: { title }
+      where: { title },
     });
 
     if (checkExistsPaymentModeTitle) {
@@ -39,7 +39,6 @@ class UpdatePaymentModeService {
     await paymentModeRepository.save(paymentMode);
 
     return paymentMode;
-
   }
 }
 

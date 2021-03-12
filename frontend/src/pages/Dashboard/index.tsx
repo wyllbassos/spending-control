@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Button from '../../components/Button';
 
 import api from '../../services/api';
@@ -20,14 +20,20 @@ interface Registers {
   subCategories: Register[];
 }
 
+interface KeyValue {
+  key: string;
+  value: any;
+}
+
 const Dashboard: React.FC = () => {
   const [paymentModes, setPaymentModes] = useState<Register[]>([]);
   const [categories, setCategories] = useState<Register[]>([]);
   const [subCategories, setSubCategories] = useState<Register[]>([]);
-  const [state, setState] = useState<{ step: number; params: object[] }>({
+  const [state, setState] = useState<{ step: number; params: KeyValue[] }>({
     step: 0,
     params: [],
   });
+  const [inputValue, setInputValue] = useState('');
 
   useEffect(() => {
     api.get<Registers>('registers').then(({ data }) => {
@@ -38,9 +44,43 @@ const Dashboard: React.FC = () => {
   }, []);
 
   const handleNextStep = useCallback((key, value) => {
+    let newValue = value;
+    if (key === 'value') {
+      newValue = String(newValue).replace(',', '.');
+      console.log(newValue);
+      newValue = Number(newValue);
+      if (Number.isNaN(newValue)) {
+        alert('Deve ser um valor numérico');
+        return;
+      }
+      if (newValue < 0) {
+        alert('O Valor Deve maior ou igual a zero');
+        return;
+      }
+      setInputValue('');
+    }
+
+    if (key === 'title') {
+      if (newValue === '') {
+        alert('A Descrição não pode ser nula');
+        return;
+      }
+      setInputValue(new Date().toISOString().split('T')[0]);
+      // setInputValue('');
+    }
+
+    if (key === 'date' || key === 'payment_date') {
+      console.log(newValue);
+      if (newValue === '') {
+        alert('A data deve ser preenchida');
+        return;
+      }
+      // setInputValue(new Date().toISOString());
+    }
+
     setState(current => ({
       step: current.step + 1,
-      params: [...current.params, { [key]: value }],
+      params: [...current.params, { key, value: newValue }],
     }));
   }, []);
 
@@ -49,10 +89,15 @@ const Dashboard: React.FC = () => {
       step: 0,
       params: [],
     }));
+    setInputValue('');
   }, []);
 
-  console.log(state);
+  const handleSaveTransaction = useCallback(() => {
+    console.log('ok');
+  }, []);
 
+  // console.log(state);
+  console.log(inputValue);
   return (
     <>
       <Header selected="/" />
@@ -72,8 +117,13 @@ const Dashboard: React.FC = () => {
         {state.step === 1 && (
           <div>
             <span>Valor</span>
-            <Input type="number" min={0} />
-            <Button onClick={() => handleNextStep('value', 0)}>Avançar</Button>
+            <Input
+              value={inputValue}
+              onChange={e => setInputValue(e.target.value)}
+            />
+            <Button onClick={() => handleNextStep('value', inputValue)}>
+              Avançar
+            </Button>
           </div>
         )}
 
@@ -122,13 +172,64 @@ const Dashboard: React.FC = () => {
         {state.step === 5 && (
           <div>
             <span>Descrição</span>
-            <Input type="text" />
-            <Button onClick={() => handleNextStep('title', '')}>Avançar</Button>
+            <Input
+              value={inputValue}
+              onChange={e => setInputValue(e.target.value)}
+              type="text"
+            />
+            <Button onClick={() => handleNextStep('title', inputValue)}>
+              Avançar
+            </Button>
+          </div>
+        )}
+
+        {state.step === 6 && (
+          <div>
+            <span>Data</span>
+            <Input
+              value={inputValue}
+              onChange={e => setInputValue(e.target.value)}
+              type="date"
+            />
+            <Button onClick={() => handleNextStep('date', inputValue)}>
+              Avançar
+            </Button>
+          </div>
+        )}
+
+        {state.step === 7 && (
+          <div>
+            <span>Data de Pagamento</span>
+            <Input
+              value={inputValue}
+              onChange={e => setInputValue(e.target.value)}
+              type="date"
+            />
+            <Button onClick={() => handleNextStep('payment_date', inputValue)}>
+              Avançar
+            </Button>
+          </div>
+        )}
+
+        {state.step === 8 && (
+          <div>
+            {state.params.map(field => (
+              <div key={field.key}>
+                <span>{field.key}</span>
+                <span>{field.value}</span>
+              </div>
+            ))}
+            <Button onClick={handleSaveTransaction}>Cadastrar</Button>
           </div>
         )}
 
         {state.step !== 0 && (
-          <Button onClick={() => handleReset()}>Voltar</Button>
+          <Button
+            style={{ backgroundColor: 'red' }}
+            onClick={() => handleReset()}
+          >
+            Cancelar
+          </Button>
         )}
       </Container>
     </>

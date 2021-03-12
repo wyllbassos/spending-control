@@ -10,7 +10,7 @@ import uploadConfig from '../config/upload';
 
 // import TransactionsRepository from '../repositories/TransactionsRepository';
 import CreateTransactionService from '../services/Transaction/CreateTransactionService';
-import BalanceTransactionsService from '../services/Transaction/Balance/BalanceTransactionsService';
+// import BalanceTransactionsService from '../services/Transaction/Balance/BalanceTransactionsService';
 import DeleteTransactionService from '../services/Transaction/DeleteTransactionService';
 import ImportTransactionsService from '../services/Transaction/ImportTransactionsService';
 
@@ -21,7 +21,7 @@ transactionsRouter.get('/', async (request: Request, response: Response) => {
   const transactionRepository = getRepository(Transaction);
 
   const transactions = await transactionRepository.find({
-    relations:['category', 'subCategory', 'paymentMode']
+    relations: ['category', 'subCategory', 'paymentMode'],
   });
 
   return response.json(transactions);
@@ -83,7 +83,7 @@ transactionsRouter.post('/', async (request: Request, response: Response) => {
     payment_mode_id: undefined,
     category: transactionCategory,
     subCategory: transactionSubCategory,
-    paymentMode: transactionPaymentMode
+    paymentMode: transactionPaymentMode,
   });
 });
 

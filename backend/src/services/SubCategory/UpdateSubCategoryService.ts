@@ -6,7 +6,7 @@ import AppError from '../../errors/AppError';
 
 interface Request {
   id: string;
-  title: string
+  title: string;
 }
 
 class UpdateSubCategoryService {
@@ -19,12 +19,12 @@ class UpdateSubCategoryService {
       throw new AppError('Id invalid');
     }
 
-    if(!title) {
-      throw new AppError("The title field cannot be null");
+    if (!title) {
+      throw new AppError('The title field cannot be null');
     }
 
     const checkExistsSubCategoryTitle = await subCategoryRepository.findOne({
-      where: { title }
+      where: { title },
     });
 
     if (checkExistsSubCategoryTitle) {
@@ -39,7 +39,6 @@ class UpdateSubCategoryService {
     await subCategoryRepository.save(subCategory);
 
     return subCategory;
-
   }
 }
 
