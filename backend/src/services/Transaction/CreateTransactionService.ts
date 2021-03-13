@@ -1,7 +1,7 @@
 import { getRepository } from 'typeorm';
 
 import AppError from '../../errors/AppError';
-import Category from '../../models/Category';
+// import Category from '../../models/Category';
 
 import Transaction from '../../models/Transaction';
 
@@ -86,14 +86,14 @@ function checkParms({
     throw new AppError(`The max of fractional Part in value is 2 digits`);
   }
 
-  checkIfValueIsValid(installment_number, 'installment_number');
-
-  checkIfValueIsValid(installment_total, 'installment_total');
-
-  if (installment_number > installment_total) {
-    throw new AppError(
-      `The installment_number field cannot be greater than the installment_total field`,
-    );
+  if (installment_number) {
+    checkIfValueIsValid(installment_number, 'installment_number');
+    checkIfValueIsValid(installment_total, 'installment_total');
+    if (installment_number > installment_total) {
+      throw new AppError(
+        `The installment_number field cannot be greater than the installment_total field`,
+      );
+    }
   }
 }
 
@@ -139,7 +139,7 @@ class CreateTransactionService {
       payment_date,
       installment_number,
       installment_total,
-      executed: executed ? true : false,
+      executed: !!executed,
       category_id: categoryOfTransaction.id,
       sub_category_id: subCategoryOfTransaction.id,
       payment_mode_id: paymentModeOfTransaction.id,

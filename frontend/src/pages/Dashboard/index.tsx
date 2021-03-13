@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+/* eslint-disable @typescript-eslint/camelcase */
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Button from '../../components/Button';
 
 import api from '../../services/api';
 
 import Header from '../../components/Header';
 import Input from '../../components/Input';
-import Select from '../../components/Select';
 
 import { Container } from './styles';
 
@@ -21,19 +21,54 @@ interface Registers {
 }
 
 interface KeyValue {
-  key: string;
+  stepKey: string;
   value: any;
 }
+
+type Keys =
+  | 'type'
+  | 'value'
+  | 'paymentMode'
+  | 'category'
+  | 'subCategory'
+  | 'title'
+  | 'date'
+  | 'payment_date'
+  | 'executed';
+
+const keys: Keys[] = [
+  'type',
+  'value',
+  'paymentMode',
+  'category',
+  'subCategory',
+  'title',
+  'date',
+  'payment_date',
+  'executed',
+];
+
+const initialParams = {
+  type: '',
+  value: '',
+  paymentMode: '',
+  category: '',
+  subCategory: '',
+  title: '',
+  date: new Date().toISOString().split('T')[0],
+  payment_date: new Date().toISOString().split('T')[0],
+  executed: '',
+};
 
 const Dashboard: React.FC = () => {
   const [paymentModes, setPaymentModes] = useState<Register[]>([]);
   const [categories, setCategories] = useState<Register[]>([]);
   const [subCategories, setSubCategories] = useState<Register[]>([]);
-  const [state, setState] = useState<{ step: number; params: KeyValue[] }>({
-    step: 0,
-    params: [],
-  });
-  const [inputValue, setInputValue] = useState('');
+  const [step, setStep] = useState(0);
+  const [params, setParams] = useState(initialParams);
+
+  const stepKey = useMemo(() => keys[step], [step]);
+  const value = useMemo(() => params[keys[step]], [params, step]);
 
   useEffect(() => {
     api.get<Registers>('registers').then(({ data }) => {
@@ -43,97 +78,97 @@ const Dashboard: React.FC = () => {
     });
   }, []);
 
-  const handleNextStep = useCallback((key, value) => {
-    let newValue = value;
-    if (key === 'value') {
-      newValue = String(newValue).replace(',', '.');
-      console.log(newValue);
-      newValue = Number(newValue);
-      if (Number.isNaN(newValue)) {
-        alert('Deve ser um valor numérico');
-        return;
-      }
-      if (newValue < 0) {
-        alert('O Valor Deve maior ou igual a zero');
-        return;
-      }
-      setInputValue('');
-    }
-
-    if (key === 'title') {
-      if (newValue === '') {
-        alert('A Descrição não pode ser nula');
-        return;
-      }
-      setInputValue(new Date().toISOString().split('T')[0]);
-      // setInputValue('');
-    }
-
-    if (key === 'date' || key === 'payment_date') {
-      console.log(newValue);
-      if (newValue === '') {
-        alert('A data deve ser preenchida');
-        return;
-      }
-      // setInputValue(new Date().toISOString());
-    }
-
-    setState(current => ({
-      step: current.step + 1,
-      params: [...current.params, { key, value: newValue }],
-    }));
-  }, []);
-
-  const handleReset = useCallback(() => {
-    setState(current => ({
-      step: 0,
-      params: [],
-    }));
-    setInputValue('');
-  }, []);
-
   const handleSaveTransaction = useCallback(() => {
-    console.log('ok');
-  }, []);
+    api.post('transactions', params).then(response => {
+      console.log(response);
+      alert('Transação Cadastrada');
+      setStep(0);
+      setParams(initialParams);
+    });
+  }, [params]);
 
-  // console.log(state);
-  console.log(inputValue);
+  const handleSetParams = useCallback(
+    (changeValue): boolean => {
+      let newValue = changeValue;
+
+      if (stepKey === 'value') {
+        newValue = String(newValue).replace(',', '.');
+        newValue = Number(newValue);
+        if (Number.isNaN(newValue)) {
+          alert('Deve ser um valor numérico');
+          return false;
+        }
+        if (newValue < 0) {
+          alert('O Valor Deve maior ou igual a zero');
+          return false;
+        }
+      }
+
+      if (stepKey === 'title') {
+        if (newValue === '') {
+          alert('A Descrição não pode ser nula');
+          return false;
+        }
+      }
+
+      if (stepKey === 'date' || stepKey === 'payment_date') {
+        if (newValue === '') {
+          alert('A data deve ser preenchida');
+          return false;
+        }
+      }
+
+      setParams(current => ({
+        ...current,
+        [stepKey]: newValue,
+      }));
+      return true;
+    },
+    [stepKey],
+  );
+
+  const handleNextStep = useCallback(
+    changeValue => {
+      if (!handleSetParams(changeValue)) return;
+
+      setStep(current => current + 1);
+    },
+    [handleSetParams],
+  );
+
+  // console.log(params);
+
   return (
     <>
       <Header selected="/" />
       <Container>
-        {state.step === 0 && (
+        {step === 0 && (
           <div>
             <span>Tipo de Transação</span>
-            <Button onClick={() => handleNextStep('type', 'income')}>
-              Entrada
-            </Button>
-            <Button onClick={() => handleNextStep('type', 'outcome')}>
-              Saída
-            </Button>
+            <Button onClick={() => handleNextStep('income')}>Entrada</Button>
+            <Button onClick={() => handleNextStep('outcome')}>Saída</Button>
           </div>
         )}
 
-        {state.step === 1 && (
+        {step === 1 && (
           <div>
             <span>Valor</span>
             <Input
-              value={inputValue}
-              onChange={e => setInputValue(e.target.value)}
+              value={value}
+              onChange={e => handleSetParams(e.target.value)}
+              type="number"
             />
-            <Button onClick={() => handleNextStep('value', inputValue)}>
-              Avançar
-            </Button>
+            <Button onClick={() => handleNextStep(value)}>Avançar</Button>
           </div>
         )}
 
-        {state.step === 2 && (
+        {step === 2 && (
           <div>
             <span>Tipo de Pagamento</span>
             {paymentModes.map(paymentMode => (
               <Button
                 key={paymentMode.id}
-                onClick={() => handleNextStep('paymentMode', paymentMode.title)}
+                onClick={() => handleNextStep(paymentMode.title)}
               >
                 {paymentMode.title}
               </Button>
@@ -141,13 +176,13 @@ const Dashboard: React.FC = () => {
           </div>
         )}
 
-        {state.step === 3 && (
+        {step === 3 && (
           <div>
             <span>Categoria</span>
             {categories.map(category => (
               <Button
                 key={category.id}
-                onClick={() => handleNextStep('category', category.title)}
+                onClick={() => handleNextStep(category.title)}
               >
                 {category.title}
               </Button>
@@ -155,13 +190,13 @@ const Dashboard: React.FC = () => {
           </div>
         )}
 
-        {state.step === 4 && (
+        {step === 4 && (
           <div>
             <span>Sub Categoria</span>
             {subCategories.map(subCategory => (
               <Button
                 key={subCategory.id}
-                onClick={() => handleNextStep('subCategory', subCategory.title)}
+                onClick={() => handleNextStep(subCategory.title)}
               >
                 {subCategory.title}
               </Button>
@@ -169,139 +204,90 @@ const Dashboard: React.FC = () => {
           </div>
         )}
 
-        {state.step === 5 && (
+        {step === 5 && (
           <div>
             <span>Descrição</span>
             <Input
-              value={inputValue}
-              onChange={e => setInputValue(e.target.value)}
+              value={value}
+              onChange={e => handleSetParams(e.target.value)}
               type="text"
             />
-            <Button onClick={() => handleNextStep('title', inputValue)}>
-              Avançar
-            </Button>
+            <Button onClick={() => handleNextStep(value)}>Avançar</Button>
           </div>
         )}
 
-        {state.step === 6 && (
+        {step === 6 && (
           <div>
             <span>Data</span>
             <Input
-              value={inputValue}
-              onChange={e => setInputValue(e.target.value)}
+              value={value}
+              onChange={e => handleSetParams(e.target.value)}
               type="date"
             />
-            <Button onClick={() => handleNextStep('date', inputValue)}>
-              Avançar
-            </Button>
+            <Button onClick={() => handleNextStep(value)}>Avançar</Button>
           </div>
         )}
 
-        {state.step === 7 && (
+        {step === 7 && (
           <div>
             <span>Data de Pagamento</span>
             <Input
-              value={inputValue}
-              onChange={e => setInputValue(e.target.value)}
+              value={value}
+              onChange={e => handleSetParams(e.target.value)}
               type="date"
             />
-            <Button onClick={() => handleNextStep('payment_date', inputValue)}>
-              Avançar
-            </Button>
+            <Button onClick={() => handleNextStep(value)}>Avançar</Button>
           </div>
         )}
 
-        {state.step === 8 && (
+        {step === 8 && (
           <div>
-            {state.params.map(field => (
-              <div key={field.key}>
-                <span>{field.key}</span>
-                <span>{field.value}</span>
-              </div>
-            ))}
-            <Button onClick={handleSaveTransaction}>Cadastrar</Button>
+            <span>Gasto Pago.</span>
+            <Button onClick={() => handleNextStep(0)}>Não</Button>
+            <Button onClick={() => handleNextStep(1)}>Sim</Button>
           </div>
         )}
 
-        {state.step !== 0 && (
+        {step === 9 && (
+          <>
+            <table>
+              <thead>
+                <tr>
+                  <th>Field</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                {keys.map(key => (
+                  <tr key={key}>
+                    <td>{key}</td>
+                    <td>{params[key]}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <Button
+              style={{ backgroundColor: 'green' }}
+              onClick={handleSaveTransaction}
+            >
+              Cadastrar
+            </Button>
+          </>
+        )}
+
+        {step !== 0 && (
           <Button
             style={{ backgroundColor: 'red' }}
-            onClick={() => handleReset()}
+            onClick={() => {
+              setStep(step - 1);
+            }}
           >
-            Cancelar
+            Voltar
           </Button>
         )}
       </Container>
     </>
   );
-
-  /*
-  return (
-    <>
-      <Header selected="/" />
-      <Container>
-        <Input type="date" label="Data Compra" />
-
-        <Input type="date" label="Data Pagamento" />
-
-        <Select
-          label="Tipo"
-          options={[
-            { value: 'outcome', text: 'Saida' },
-            { value: 'income', text: 'Entrada' },
-          ]}
-        />
-
-        <Input type="number" label="Valor" />
-
-        <Select
-          label="Forma de Pagamento"
-          options={[
-            { value: 'outcome', text: 'Crédito' },
-            { value: 'income', text: 'Débito' },
-            { value: 'income', text: 'Dinheiro' },
-          ]}
-        />
-
-        <Select
-          label="Forma de Pagamento"
-          options={paymentModes.map(paymentMode => ({
-            value: paymentMode.title,
-            text: paymentMode.title,
-          }))}
-        />
-
-        <Select
-          label="Categoria"
-          options={categories.map(category => ({
-            value: category.title,
-            text: category.title,
-          }))}
-        />
-
-        <Select
-          label="Sub Categoria"
-          options={subCategories.map(subCategory => ({
-            value: subCategory.title,
-            text: subCategory.title,
-          }))}
-        />
-
-        <Input type="text" label="Descrição" />
-
-        <Select
-          label="Situação"
-          options={[
-            { value: 0, text: 'Pendente' },
-            { value: 1, text: 'Pago' },
-          ]}
-        />
-
-        <Button>Adicionar Gasto</Button>
-      </Container>
-    </>
-  );
-  */
 };
 
 export default Dashboard;

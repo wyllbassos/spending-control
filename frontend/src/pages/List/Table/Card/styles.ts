@@ -34,6 +34,8 @@ export const Container = styled.div`
   color: #fff;
   border-radius: 8px;
   padding: 16px;
+  margin-bottom: 16px;
+
   section {
     display: flex;
     width: 100%;

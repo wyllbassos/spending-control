@@ -34,10 +34,12 @@ export default class CreateTransactions1604879024928
           {
             name: 'installment_number',
             type: 'int',
+            isNullable: true,
           },
           {
             name: 'installment_total',
             type: 'int',
+            isNullable: true,
           },
           {
             name: 'executed',
