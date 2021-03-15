@@ -3,18 +3,19 @@ import styled from 'styled-components/native';
 export const Container = styled.SafeAreaView`
   flex: 1;
   align-items: center;
-  padding: 16px;
+`;
+
+export const Title = styled.Text`
+  font-size: 14px;
+  margin-top: 10px;
 `;
 
 export const ButtonMenu = styled.TouchableOpacity`
-  width: 100%;
-  margin-bottom: 16px;
-  padding: 16px;
-  background-color: #5636d3;
-  align-items: center;
+  font-size: 14px;
+  margin-top: 10px;
 `;
 
 export const TextButtonMenu = styled.Text`
-  color: #ebeef8;
-  font-size: 16px;
+  font-size: 14px;
+  margin-top: 10px;
 `;

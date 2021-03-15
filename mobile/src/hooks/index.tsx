@@ -1,13 +1,13 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 
-import { CartProvider } from './cart';
+import { FinaceProvider } from './finance';
 
 const AppProvider: React.FC = ({ children }) => {
   return (
-    <CartProvider>
+    <FinaceProvider>
       <NavigationContainer>{children}</NavigationContainer>
-    </CartProvider>
+    </FinaceProvider>
   );
 };
 
