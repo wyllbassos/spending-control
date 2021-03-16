@@ -6,15 +6,23 @@ export const Container = styled.SafeAreaView`
   padding: 24px;
 `;
 
-export const ButtonMenu = styled.TouchableOpacity`
+export const InputRegister = styled.TextInput`
   width: 100%;
   padding: 16px;
-  margin-bottom: 24px;
+  background-color: #5636d3;
+  color: #ebeef8;
+  font-size: 16px;
+`;
+
+export const ButtonSubmit = styled.TouchableOpacity`
+  width: 100%;
+  padding: 16px;
+  margin: 24px 0;
   background-color: #5636d3;
   border-radius: 8px;
 `;
 
-export const TextButtonMenu = styled.Text`
+export const TextButtonSubmit = styled.Text`
   color: #ebeef8;
   font-size: 24px;
 `;

@@ -1,7 +1,7 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useCallback} from 'react';
 
-import {Container, ButtonMenu, TextButtonMenu} from './styles';
+import {Container, MenuContainer, ButtonMenu, TextButtonMenu} from './styles';
 
 const Dashboard: React.FC = () => {
   const navigation = useNavigation();
@@ -15,17 +15,21 @@ const Dashboard: React.FC = () => {
 
   return (
     <Container>
-      <ButtonMenu onPress={() => handleChangePage('AddTransaction')}>
-        <TextButtonMenu>Adicionar Transação</TextButtonMenu>
-      </ButtonMenu>
+      <MenuContainer>
+        <ButtonMenu onPress={() => handleChangePage('AddTransaction')}>
+          <TextButtonMenu>Adicionar Transação</TextButtonMenu>
+        </ButtonMenu>
 
-      <ButtonMenu onPress={() => handleChangePage('Transactions')}>
-        <TextButtonMenu>Lista de Transações</TextButtonMenu>
-      </ButtonMenu>
+        <ButtonMenu onPress={() => handleChangePage('Transactions')}>
+          <TextButtonMenu>Lista de Transações</TextButtonMenu>
+        </ButtonMenu>
+      </MenuContainer>
 
-      <ButtonMenu onPress={() => handleChangePage('Registers')}>
-        <TextButtonMenu>Cadastros</TextButtonMenu>
-      </ButtonMenu>
+      <MenuContainer>
+        <ButtonMenu onPress={() => handleChangePage('Registers')}>
+          <TextButtonMenu>Cadastros</TextButtonMenu>
+        </ButtonMenu>
+      </MenuContainer>
     </Container>
   );
 };
