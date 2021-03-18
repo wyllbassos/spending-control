@@ -1,13 +1,13 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import {NavigationContainer} from '@react-navigation/native';
 
-import { FinaceProvider } from './finance';
+import {RegistersProvider} from './registers';
 
-const AppProvider: React.FC = ({ children }) => {
+const AppProvider: React.FC = ({children}) => {
   return (
-    <FinaceProvider>
+    <RegistersProvider>
       <NavigationContainer>{children}</NavigationContainer>
-    </FinaceProvider>
+    </RegistersProvider>
   );
 };
 

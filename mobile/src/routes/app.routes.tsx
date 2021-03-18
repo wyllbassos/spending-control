@@ -15,9 +15,11 @@ const App = createStackNavigator();
 
 const headerTitleDashboard = (props: any) => <Logo {...props} />;
 
-const PaymentModesRegister = () => RegisterForm({register: 'payment-modes'});
-const CategoriesRegister = () => RegisterForm({register: 'categories'});
-const SubCategoriesRegister = () => RegisterForm({register: 'sub-categories'});
+const PaymentModesRegister = () =>
+  RegisterForm({registerName: 'payment-modes'});
+const CategoriesRegister = () => RegisterForm({registerName: 'categories'});
+const SubCategoriesRegister = () =>
+  RegisterForm({registerName: 'sub-categories'});
 
 const appScreens = [
   {
