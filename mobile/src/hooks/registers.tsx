@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 
 import AsyncStorage from '@react-native-community/async-storage';
+import {Alert} from 'react-native';
 
 export type RegisterKeys = 'payment-modes' | 'categories' | 'sub-categories';
 
@@ -26,6 +27,10 @@ interface RegistersContext {
   addRegister: (
     registerName: RegisterKeys,
     register: Register,
+  ) => Promise<void>;
+  removeRegister: (
+    registerName: RegisterKeys,
+    registerId: string,
   ) => Promise<void>;
 }
 
@@ -63,10 +68,40 @@ const RegistersProvider: React.FC = ({children}) => {
     [registers],
   );
 
-  const value = React.useMemo(() => ({registers, addRegister}), [
-    registers,
-    addRegister,
-  ]);
+  const removeRegister = useCallback(
+    async (registerName: RegisterKeys, registerId: string): Promise<void> => {
+      let deleteRegister = false;
+      const newRegistersToDelete = [...registers[registerName]];
+      const index = newRegistersToDelete.findIndex(
+        (register) => register.id === registerId,
+      );
+
+      if (index < 0) {
+        Alert.alert('Registro Não Localizado');
+        return;
+      }
+
+      newRegistersToDelete.splice(index, 1);
+
+      const newRegisters = {
+        ...registers,
+        [registerName]: newRegistersToDelete,
+      };
+
+      await AsyncStorage.setItem(
+        'gofinances@registers',
+        JSON.stringify(newRegisters),
+      );
+
+      setRegisters(newRegisters);
+    },
+    [registers],
+  );
+
+  const value = React.useMemo(
+    () => ({registers, addRegister, removeRegister}),
+    [registers, addRegister, removeRegister],
+  );
 
   return (
     <RegistersContext.Provider value={value}>

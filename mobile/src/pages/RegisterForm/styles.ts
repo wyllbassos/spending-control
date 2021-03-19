@@ -31,12 +31,44 @@ export const InputRegister = styled.TextInput`
   font-size: 24px;
 `;
 
-export const ButtonSubmit = styled.TouchableOpacity`
+export const ButtonToRegister = styled.TouchableOpacity`
   width: 100%;
   padding: 16px;
-  margin: 24px 0;
-  background-color: #5636d3;
+  margin: 16px 0;
+  background-color: green;
   border-radius: 8px;
+`;
+
+export const ButtonsContainer = styled.View`
+  margin: 16px 0 0 0;
+  flex-direction: row;
+`;
+
+export const ButtonChange = styled.TouchableOpacity`
+  width: 50%;
+  align-items: center;
+  padding: 16px;
+  border-top-left-radius: 8px;
+  background-color: red;
+  background-color: green;
+`;
+
+export const ButtonDelete = styled.TouchableOpacity`
+  width: 50%;
+  align-items: center;
+  padding: 16px;
+  border-top-right-radius: 8px;
+  background-color: red;
+`;
+
+export const ButtonCancel = styled.TouchableOpacity`
+  width: 100%;
+  align-items: center;
+  padding: 16px;
+  margin-bottom: 16px;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  background-color: #5636d3;
 `;
 
 export const TextButtonSubmit = styled.Text`
@@ -48,13 +80,12 @@ export const RegisterList = styled(FlatList as new () => FlatList<Register>)`
   width: 100%;
 `;
 
-export const RegisterContainer = styled.View`
+export const RegisterContainer = styled.TouchableOpacity`
   width: 100%;
   background-color: #5636d3;
   margin-top: 8px;
   padding: 8px 16px;
   border-radius: 8px;
-  border-bottom-width: 0;
 `;
 
 export const RegisterText = styled.Text`
