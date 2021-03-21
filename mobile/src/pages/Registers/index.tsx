@@ -1,31 +1,37 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useCallback} from 'react';
+import Button from '../../components/Button';
+import {RegisterKeys} from '../../hooks/registers';
+import {useRegisters} from '../../hooks';
 
-import {Container, ButtonMenu, TextButtonMenu} from './styles';
+import {Container} from './styles';
 
 const Dashboard: React.FC = () => {
   const navigation = useNavigation();
 
+  const {setSelectedRegister} = useRegisters();
+
   const handleRegister = useCallback(
-    (register: string) => {
-      navigation.navigate(register);
+    (register: RegisterKeys) => {
+      setSelectedRegister(register);
+      navigation.navigate('Register-list');
     },
     [navigation],
   );
 
   return (
     <Container>
-      <ButtonMenu onPress={() => handleRegister('payment-modes')}>
-        <TextButtonMenu>Formas de Pagamentos</TextButtonMenu>
-      </ButtonMenu>
+      <Button
+        text="Formas de Pagamentos"
+        onPress={() => handleRegister('payment-modes')}
+      />
 
-      <ButtonMenu onPress={() => handleRegister('categories')}>
-        <TextButtonMenu>Categoria</TextButtonMenu>
-      </ButtonMenu>
+      <Button text="Categorias" onPress={() => handleRegister('categories')} />
 
-      <ButtonMenu onPress={() => handleRegister('sub-categories')}>
-        <TextButtonMenu>Sub Categoria</TextButtonMenu>
-      </ButtonMenu>
+      <Button
+        text="Sub Categorias"
+        onPress={() => handleRegister('sub-categories')}
+      />
     </Container>
   );
 };

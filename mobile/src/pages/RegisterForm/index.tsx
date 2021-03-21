@@ -1,141 +1,116 @@
-import React, {useCallback, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {Alert} from 'react-native';
-import {Register, RegisterKeys, useRegisters} from '../../hooks/registers';
-
+import {useRegisters} from '../../hooks';
 import {
-  Container,
-  InputRegisterContainer,
-  InputRegisterText,
-  InputRegister,
-  ButtonToRegister,
-  ButtonsContainer,
-  ButtonChange,
-  ButtonDelete,
-  ButtonCancel,
-  TextButtonSubmit,
-  RegisterList,
-  RegisterContainer,
-  RegisterText,
-} from './styles';
+  ParamListBase,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 
-const registerDescriptions: any = {
-  'payment-modes': 'Forma de Pagamento',
-  categories: 'Categoria',
-  'sub-categories': 'Sub-Categoria',
-};
+import Button from '../../components/Button';
+import Input from '../../components/Input';
 
-const RegisterForm: React.FC<{registerName: RegisterKeys}> = ({
-  registerName,
-}) => {
+import {Container} from './styles';
+
+interface RouteParams extends RouteProp<ParamListBase, string> {
+  params: {
+    registerId?: string;
+  };
+}
+
+const RegisterForm: React.FC = () => {
+  const {params} = useRoute<RouteParams>();
+  const registerId = useMemo(() => params && params.registerId, [params]);
+
+  const navigation = useNavigation();
+
   const [inputValue, setInputValue] = useState('');
-  const [selectedRegisterId, setSelectedRegisterId] = useState<
-    undefined | string
-  >();
+  const [error, setError] = useState<string>();
 
-  const {addRegister, registers, removeRegister} = useRegisters();
-
-  const list = useMemo(() => registers[registerName], [
+  const {
+    addRegister,
+    changeRegister,
     registers,
-    registerName,
+    selectedRegister,
+    registerDescriptions,
+  } = useRegisters();
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerTitle: registerDescriptions.plural,
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!!error) setError(undefined);
+  }, [inputValue]);
+
+  const list = useMemo(() => registers[selectedRegister], [
+    registers,
+    selectedRegister,
   ]);
 
-  const handleSelectRegister = useCallback((register: Register) => {
-    setSelectedRegisterId(register.id);
-    setInputValue(register.value);
-  }, []);
+  const selectedRegisterRecordId = useMemo(() => {
+    if (registerId) {
+      const selectedRegister = list.find((item) => item.id === registerId);
+      if (selectedRegister) {
+        setInputValue(selectedRegister.value);
+      }
+      return registerId;
+    }
+    return undefined;
+  }, [registerId]);
 
-  const handleUnSelectRegister = useCallback(() => {
-    setSelectedRegisterId(undefined);
-    setInputValue('');
-  }, []);
-
-  const handleRegister = useCallback(() => {
-    if (selectedRegisterId) {
+  const handleAddRegister = useCallback(async () => {
+    if (!handleCheckInputValue()) {
       return;
     }
 
-    const lastIndex = list.length - 1;
-    const lastRegister = list[lastIndex];
-    const newIndex = lastRegister ? Number(lastRegister.id) + 1 : 0;
-    const id = String(newIndex);
-    const register = {id, value: inputValue};
-    addRegister(registerName, register);
-    setInputValue('');
-  }, [list, inputValue]);
+    const ok = await addRegister(inputValue);
 
-  const handleDeleteRegister = useCallback(() => {
-    if (selectedRegisterId === undefined) {
+    if (ok) navigation.goBack();
+    else Alert.alert('erro ao incluir');
+  }, [addRegister, inputValue, navigation]);
+
+  const handleChangeRegister = useCallback(async () => {
+    if (!selectedRegisterRecordId) {
+      Alert.alert('Não Selecionado Registro para Alterar');
       return;
     }
 
-    const index = list.findIndex(
-      (register) => register.id === selectedRegisterId,
-    );
+    const ok = await changeRegister(selectedRegisterRecordId, inputValue);
 
-    Alert.alert(
-      'Atenção',
-      `Deseja deletar o registro ${list[index].value}`,
-      [
-        {
-          text: 'Cancelar',
-        },
-        {
-          text: 'Sim',
-          onPress: () => {
-            removeRegister(registerName, selectedRegisterId);
-            handleUnSelectRegister();
-          },
-        },
-      ],
-      {
-        cancelable: true,
-        onDismiss: () => '',
-      },
-    );
-  }, [registerName, selectedRegisterId, list]);
+    if (ok) navigation.goBack();
+    else Alert.alert('erro ao alterar');
+  }, [selectedRegisterRecordId, changeRegister, inputValue, navigation]);
+
+  const handleCheckInputValue = useCallback(() => {
+    if (!inputValue) {
+      const errorText = 'Nome deve ser preenchido.';
+      Alert.alert('Erro ao Cadastrar', errorText);
+      setError(errorText);
+      return false;
+    }
+    return true;
+  }, [inputValue]);
 
   return (
     <Container>
-      <InputRegisterContainer>
-        <InputRegisterText>{`Descrição da ${registerDescriptions[registerName]}:`}</InputRegisterText>
-        <InputRegister
-          value={inputValue}
-          onChangeText={(value) => setInputValue(value)}
-        />
-      </InputRegisterContainer>
-
-      {selectedRegisterId === undefined && (
-        <ButtonToRegister onPress={handleRegister}>
-          <TextButtonSubmit>Cadastrar</TextButtonSubmit>
-        </ButtonToRegister>
-      )}
-
-      {selectedRegisterId !== undefined && (
-        <>
-          <ButtonsContainer>
-            <ButtonChange onPress={handleRegister}>
-              <TextButtonSubmit>Alterar</TextButtonSubmit>
-            </ButtonChange>
-            <ButtonDelete onPress={handleDeleteRegister}>
-              <TextButtonSubmit>Deletar</TextButtonSubmit>
-            </ButtonDelete>
-          </ButtonsContainer>
-          <ButtonCancel onPress={handleUnSelectRegister}>
-            <TextButtonSubmit>Cancelar</TextButtonSubmit>
-          </ButtonCancel>
-        </>
-      )}
-
-      <RegisterList
-        data={list}
-        keyExtractor={(register) => register.id}
-        ListHeaderComponent={<InputRegisterText>Lista</InputRegisterText>}
-        renderItem={({item: register}) => (
-          <RegisterContainer onPress={() => handleSelectRegister(register)}>
-            <RegisterText>{register.value}</RegisterText>
-          </RegisterContainer>
-        )}
+      <Input
+        label={`Nome da ${registerDescriptions.singular}:`}
+        value={inputValue}
+        error={!!error}
+        onChangeText={setInputValue}
       />
+
+      {!selectedRegisterRecordId && (
+        <Button text="Cadastrar" onPress={handleAddRegister} />
+      )}
+
+      {!!selectedRegisterRecordId && (
+        <Button text="Alterar" onPress={handleChangeRegister} />
+      )}
     </Container>
   );
 };

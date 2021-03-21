@@ -1,7 +1,8 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useCallback} from 'react';
+import Button from '../../components/Button';
 
-import {Container, MenuContainer, ButtonMenu, TextButtonMenu} from './styles';
+import {Container} from './styles';
 
 const Dashboard: React.FC = () => {
   const navigation = useNavigation();
@@ -15,21 +16,12 @@ const Dashboard: React.FC = () => {
 
   return (
     <Container>
-      <MenuContainer>
-        <ButtonMenu onPress={() => handleChangePage('AddTransaction')}>
-          <TextButtonMenu>Adicionar Transação</TextButtonMenu>
-        </ButtonMenu>
+      <Button
+        text="Transações"
+        onPress={() => handleChangePage('Transactions')}
+      />
 
-        <ButtonMenu onPress={() => handleChangePage('Transactions')}>
-          <TextButtonMenu>Lista de Transações</TextButtonMenu>
-        </ButtonMenu>
-      </MenuContainer>
-
-      <MenuContainer>
-        <ButtonMenu onPress={() => handleChangePage('Registers')}>
-          <TextButtonMenu>Cadastros</TextButtonMenu>
-        </ButtonMenu>
-      </MenuContainer>
+      <Button text="Cadastros" onPress={() => handleChangePage('Registers')} />
     </Container>
   );
 };

@@ -4,6 +4,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
 } from 'react';
 
 import AsyncStorage from '@react-native-community/async-storage';
@@ -22,21 +23,28 @@ export interface Registers {
   'sub-categories': Register[];
 }
 
-interface RegistersContext {
+export interface RegistersContextProps {
+  selectedRegister: RegisterKeys;
+  setSelectedRegister: React.Dispatch<React.SetStateAction<RegisterKeys>>;
+  registerDescriptions: {
+    singular: string;
+    plural: string;
+  };
   registers: Registers;
-  addRegister: (
-    registerName: RegisterKeys,
-    register: Register,
-  ) => Promise<void>;
-  removeRegister: (
-    registerName: RegisterKeys,
-    registerId: string,
-  ) => Promise<void>;
+  addRegister: (value: string) => Promise<boolean>;
+  removeRegister: (id: string) => Promise<boolean>;
+  changeRegister: (id: string, value: string) => Promise<boolean>;
 }
 
-const RegistersContext = createContext<RegistersContext | null>(null);
+export const RegistersContext = createContext<RegistersContextProps | null>(
+  null,
+);
 
 const RegistersProvider: React.FC = ({children}) => {
+  const [selectedRegister, setSelectedRegister] = useState<RegisterKeys>(
+    'payment-modes',
+  );
+
   const [registers, setRegisters] = useState<Registers>({
     'payment-modes': [],
     categories: [],
@@ -51,11 +59,28 @@ const RegistersProvider: React.FC = ({children}) => {
     });
   }, []);
 
+  const registerDescriptions = useMemo(
+    () =>
+      selectedRegister === 'categories'
+        ? {singular: 'Categoria', plural: 'Categorias'}
+        : selectedRegister === 'payment-modes'
+        ? {singular: 'Forma de Pagamento', plural: 'Formas de Pagamento'}
+        : {singular: 'Sub Categoria', plural: 'Sub Categorias'},
+    [selectedRegister],
+  );
+
   const addRegister = useCallback(
-    async (registerName: RegisterKeys, register: Register): Promise<void> => {
+    async (value: string): Promise<boolean> => {
+      const list = registers[selectedRegister];
+
+      const lastIndex = list.length - 1;
+      const lastRegister = list[lastIndex];
+      const newIndex = lastRegister ? Number(lastRegister.id) + 1 : 0;
+      const id = String(newIndex);
+      const record = {id, value: value.toUpperCase()};
       const newRegisters = {
         ...registers,
-        [registerName]: [...registers[registerName], register],
+        [selectedRegister]: [...list, record],
       };
 
       await AsyncStorage.setItem(
@@ -64,28 +89,60 @@ const RegistersProvider: React.FC = ({children}) => {
       );
 
       setRegisters(newRegisters);
+
+      return true;
     },
-    [registers],
+    [registers, selectedRegister],
   );
 
-  const removeRegister = useCallback(
-    async (registerName: RegisterKeys, registerId: string): Promise<void> => {
-      let deleteRegister = false;
-      const newRegistersToDelete = [...registers[registerName]];
+  const changeRegister = useCallback(
+    async (id: string, value: string): Promise<boolean> => {
+      const newRegistersToDelete = [...registers[selectedRegister]];
       const index = newRegistersToDelete.findIndex(
-        (register) => register.id === registerId,
+        (register) => register.id === id,
       );
 
       if (index < 0) {
         Alert.alert('Registro Não Localizado');
-        return;
+        return false;
+      }
+
+      newRegistersToDelete[index].value = value.toUpperCase();
+
+      const newRegisters = {
+        ...registers,
+        [selectedRegister]: newRegistersToDelete,
+      };
+
+      await AsyncStorage.setItem(
+        'gofinances@registers',
+        JSON.stringify(newRegisters),
+      );
+
+      setRegisters(newRegisters);
+
+      return true;
+    },
+    [registers, selectedRegister],
+  );
+
+  const removeRegister = useCallback(
+    async (id: string): Promise<boolean> => {
+      const newRegistersToDelete = [...registers[selectedRegister]];
+      const index = newRegistersToDelete.findIndex(
+        (register) => register.id === id,
+      );
+
+      if (index < 0) {
+        Alert.alert('Registro Não Localizado');
+        return false;
       }
 
       newRegistersToDelete.splice(index, 1);
 
       const newRegisters = {
         ...registers,
-        [registerName]: newRegistersToDelete,
+        [selectedRegister]: newRegistersToDelete,
       };
 
       await AsyncStorage.setItem(
@@ -94,13 +151,30 @@ const RegistersProvider: React.FC = ({children}) => {
       );
 
       setRegisters(newRegisters);
+      return true;
     },
-    [registers],
+    [registers, selectedRegister],
   );
 
-  const value = React.useMemo(
-    () => ({registers, addRegister, removeRegister}),
-    [registers, addRegister, removeRegister],
+  const value: RegistersContextProps = React.useMemo(
+    () => ({
+      registers,
+      addRegister,
+      changeRegister,
+      removeRegister,
+      selectedRegister,
+      setSelectedRegister,
+      registerDescriptions,
+    }),
+    [
+      registers,
+      addRegister,
+      changeRegister,
+      removeRegister,
+      selectedRegister,
+      setSelectedRegister,
+      registerDescriptions,
+    ],
   );
 
   return (
@@ -110,14 +184,4 @@ const RegistersProvider: React.FC = ({children}) => {
   );
 };
 
-function useRegisters(): RegistersContext {
-  const context = useContext(RegistersContext);
-
-  if (!context) {
-    throw new Error(`useRegisters must be used within a RegistersProvider`);
-  }
-
-  return context;
-}
-
-export {RegistersProvider, useRegisters};
+export default RegistersProvider;

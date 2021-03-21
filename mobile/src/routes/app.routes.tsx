@@ -1,25 +1,18 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 
-// import FeatherIcon from 'react-native-vector-icons/Feather';
-
 import Dashboard from '../pages/Dashboard';
-import ListTransactions from '../pages/ListTransactions';
+import TransactionsList from '../pages/TransactionsList';
 import Registers from '../pages/Registers';
 import RegisterForm from '../pages/RegisterForm';
-import AddTransaction from '../pages/AddTransaction';
+import TransactionForm from '../pages/TransactionForm';
+import RegisterList from '../pages/RegisterList';
 
 import Logo from '../components/logo';
 
 const App = createStackNavigator();
 
 const headerTitleDashboard = (props: any) => <Logo {...props} />;
-
-const PaymentModesRegister = () =>
-  RegisterForm({registerName: 'payment-modes'});
-const CategoriesRegister = () => RegisterForm({registerName: 'categories'});
-const SubCategoriesRegister = () =>
-  RegisterForm({registerName: 'sub-categories'});
 
 const appScreens = [
   {
@@ -30,15 +23,15 @@ const appScreens = [
   },
   {
     key: 1,
-    headerTitle: 'Lista de Transações',
+    headerTitle: 'Transações',
     name: 'Transactions',
-    component: ListTransactions,
+    component: TransactionsList,
   },
   {
     key: 2,
-    headerTitle: 'Adicionar Transação',
-    name: 'AddTransaction',
-    component: AddTransaction,
+    headerTitle: 'Transações',
+    name: 'Transaction-form',
+    component: TransactionForm,
   },
   {
     key: 3,
@@ -48,21 +41,15 @@ const appScreens = [
   },
   {
     key: 4,
-    headerTitle: 'Formas de Pagamento',
-    name: 'payment-modes',
-    component: PaymentModesRegister,
+    headerTitle: 'Lista',
+    name: 'Register-list',
+    component: RegisterList,
   },
   {
     key: 5,
-    headerTitle: 'Categorias',
-    name: 'categories',
-    component: CategoriesRegister,
-  },
-  {
-    key: 6,
-    headerTitle: 'Sub Categorias',
-    name: 'sub-categories',
-    component: SubCategoriesRegister,
+    headerTitle: 'Cadastro',
+    name: 'Register-form',
+    component: RegisterForm,
   },
 ];
 
