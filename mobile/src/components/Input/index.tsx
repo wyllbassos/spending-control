@@ -1,15 +1,21 @@
 import {Picker} from '@react-native-picker/picker';
-import React, {useState, useCallback} from 'react';
-import {
-  Dimensions,
-  LayoutChangeEvent,
-  TextInputProps,
-  useWindowDimensions,
-} from 'react-native';
+import React, {useState, useCallback, useMemo} from 'react';
+import {TextInputProps, useWindowDimensions} from 'react-native';
+import Icon from 'react-native-vector-icons/Feather';
 
-import {Container, TextInput, InputLabel, PickerContainer} from './styles';
+import {
+  Container,
+  TextInput,
+  InputLabel,
+  PickerContainer,
+  DatePickerContainer,
+} from './styles';
+
+import DateTimePicker from '@react-native-community/datetimepicker';
+import {format} from 'date-fns';
 
 interface InputProps extends TextInputProps {
+  type?: 'text' | 'picker' | 'datePicker';
   error?: boolean;
   icon?: string;
   containerStyle?: object;
@@ -20,6 +26,8 @@ interface InputProps extends TextInputProps {
     value: string;
     id: string;
   }>;
+  onChangeDate?: (date: Date) => void;
+  datePickerValue?: Date;
 }
 
 export interface InputRef extends TextInputProps {
@@ -27,6 +35,7 @@ export interface InputRef extends TextInputProps {
 }
 
 const Input: React.FC<InputProps> = ({
+  children,
   icon,
   containerStyle,
   error,
@@ -35,10 +44,15 @@ const Input: React.FC<InputProps> = ({
   onValueChange,
   style,
   pickerList,
+  type,
+  onChangeDate,
+  datePickerValue,
   ...rest
 }) => {
   const [isFocused, setIsFocused] = useState(false);
-  const [containerWidth, setContainerWidth] = useState('70%');
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const windowDimensions = useWindowDimensions();
 
   const handleInputFocus = useCallback(() => {
     setIsFocused(true);
@@ -48,7 +62,17 @@ const Input: React.FC<InputProps> = ({
     setIsFocused(false);
   }, []);
 
-  const windowDimensions = useWindowDimensions();
+  const handleOpenDatePicker = useCallback(() => {
+    setShowDatePicker((status) => !status);
+  }, []);
+
+  const selectedDate = useMemo(() => {
+    const localDate = datePickerValue || new Date();
+    return {
+      string: format(localDate, 'dd/MM/yyyy'),
+      date: localDate,
+    };
+  }, [datePickerValue]);
 
   return (
     <Container
@@ -58,17 +82,21 @@ const Input: React.FC<InputProps> = ({
       isFilled={!!value}>
       {label && <InputLabel>{label}</InputLabel>}
 
-      {!pickerList && (
-        <TextInput
-          style={style}
-          value={value}
-          onFocus={handleInputFocus}
-          onBlur={handleInputBlur}
-          {...rest}
-        />
+      {children}
+
+      {(type === 'text' || !type) && (
+        <>
+          <TextInput
+            style={style}
+            value={value}
+            onFocus={handleInputFocus}
+            onBlur={handleInputBlur}
+            {...rest}
+          />
+        </>
       )}
 
-      {pickerList && (
+      {pickerList && type === 'picker' && (
         <PickerContainer
           pickerWidth={windowDimensions.width / 1.5 + 'px'}
           selectedValue={value}
@@ -77,6 +105,33 @@ const Input: React.FC<InputProps> = ({
             <Picker.Item color="#5636d3" key={id} label={value} value={value} />
           ))}
         </PickerContainer>
+      )}
+
+      {type === 'datePicker' && (
+        <DatePickerContainer>
+          <Icon
+            name="calendar"
+            color="#5636d3"
+            size={32}
+            onPress={handleOpenDatePicker}
+            style={{margin: 8}}
+          />
+          <TextInput
+            editable={false}
+            value={datePickerValue ? selectedDate.string : ''}
+          />
+          {showDatePicker && (
+            <DateTimePicker
+              mode="date"
+              onChange={(e: any, date: Date | undefined) => {
+                setShowDatePicker(false);
+                onChangeDate && date && onChangeDate(date);
+              }}
+              display={'calendar'}
+              value={selectedDate.date}
+            />
+          )}
+        </DatePickerContainer>
       )}
     </Container>
   );

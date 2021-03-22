@@ -16,6 +16,8 @@ export interface Transaction {
   payment_form_id: string;
   category_id: string;
   sub_category_id: string;
+  date?: Date;
+  paymentDate?: Date;
 }
 
 export interface TransactionsContextProps {
@@ -36,7 +38,18 @@ const TransactionsProvider: React.FC = ({children}) => {
     AsyncStorage.getItem('gofinances@transactions').then(
       (storageTransactions) => {
         if (storageTransactions) {
-          setTransactions(JSON.parse(storageTransactions));
+          const loadTransactions: Transaction[] = JSON.parse(
+            storageTransactions,
+          ).map((loadTransaction: Transaction) => {
+            const {value, date, paymentDate} = loadTransaction;
+            return {
+              ...loadTransaction,
+              value: !value ? 0 : Number(value),
+              date: date ? new Date(date) : undefined,
+              paymentDate: paymentDate ? new Date(paymentDate) : undefined,
+            } as Transaction;
+          });
+          setTransactions([...loadTransactions]);
         }
       },
     );

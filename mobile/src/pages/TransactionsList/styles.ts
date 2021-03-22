@@ -1,4 +1,5 @@
 import styled from 'styled-components/native';
+import FeatherIcon from 'react-native-vector-icons/Feather';
 
 export const Container = styled.SafeAreaView`
   flex: 1;
@@ -11,25 +12,42 @@ export const ListTansactionsContainer = styled.ScrollView`
   width: 100%;
 `;
 
-export const TransactionButton = styled.View`
+export const Transaction = styled.TouchableOpacity`
+  flex-direction: row;
+  flex: 1;
+  background-color: #fff;
+  margin: 8px 16px;
+  border-radius: 2px;
+  align-items: center;
+`;
+
+export const TransactionData = styled.View`
   flex: 1;
   background-color: #fff;
   margin: 8px 16px;
   border-radius: 2px;
 `;
 
+export const TransactionExpand = styled.TouchableOpacity`
+  flex-direction: row;
+  flex: 1;
+  background-color: #fff;
+  margin: 8px 16px;
+  border-radius: 2px;
+  align-items: center;
+`;
+
 export const TransactionText = styled.Text`
   flex: 1;
-  margin: 8px 0 8px 16px;
+  margin: 0 16px;
   font-size: 20px;
   color: #5636d3;
 `;
 
-export const ContainerIcon = styled.TouchableOpacity`
+export const Icon = styled(FeatherIcon)`
   justify-content: center;
   align-items: center;
-  width: 48px;
-  height: 48px;
+  width: 40px;
 `;
 
 export const ListBottonSpace = styled.View`

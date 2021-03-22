@@ -6,14 +6,14 @@ import {
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
-import {Picker} from '@react-native-picker/picker';
+
 import {useRegisters, useTransactions} from '../../hooks';
 import {Transaction} from 'src/hooks/transactions';
 
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 
-import {Container} from './styles';
+import {Container, PaddingBotton} from './styles';
 import {Register} from '../../hooks/registers';
 
 interface RouteParams extends RouteProp<ParamListBase, string> {
@@ -21,7 +21,6 @@ interface RouteParams extends RouteProp<ParamListBase, string> {
     transactionId?: string;
   };
 }
-
 const TransactionForm: React.FC = () => {
   const {params} = useRoute<RouteParams>();
   const transactionId = useMemo(() => params && params.transactionId, [params]);
@@ -90,10 +89,6 @@ const TransactionForm: React.FC = () => {
     }));
   }, []);
 
-  useEffect(() => {
-    if (!!error) setError(undefined);
-  }, [transaction.description]);
-
   const handleAddRegister = useCallback(async () => {
     if (!handleCheckFields()) {
       return;
@@ -118,13 +113,39 @@ const TransactionForm: React.FC = () => {
   }, [transaction]);
 
   const handleCheckFields = useCallback(() => {
+    let errorText = '';
     if (!transaction.description) {
-      const errorText = 'Descrição deve ser preenchida.';
-      Alert.alert('Erro ao Cadastrar', errorText);
+      errorText += 'Descrição\n';
+    }
+    if (!transaction.value) {
+      errorText += 'Valor\n';
+    }
+    if (!transaction.payment_form_id) {
+      errorText += 'Forma de Pagamento\n';
+    }
+    if (!transaction.category_id) {
+      errorText += 'Categoria\n';
+    }
+    if (!transaction.sub_category_id) {
+      errorText += 'Sub Categoria\n';
+    }
+    if (!transaction.date) {
+      errorText += 'Data\n';
+    }
+    if (!transaction.paymentDate) {
+      errorText += 'Data de Pagamento\n';
+    }
+
+    if (errorText) {
       setError(errorText);
+      Alert.alert('Preencha:', errorText);
       return false;
     }
     return true;
+  }, [transaction]);
+
+  useEffect(() => {
+    if (!!error) setError(undefined);
   }, [transaction]);
 
   const handleChangeValue = useCallback((newValue: string) => {
@@ -183,8 +204,6 @@ const TransactionForm: React.FC = () => {
     [paymentForms, categories, subCategories],
   );
 
-  console.log(transaction);
-
   return (
     <Container>
       <Input
@@ -205,6 +224,7 @@ const TransactionForm: React.FC = () => {
       />
 
       <Input
+        type="picker"
         label={'Forma de Pagamento:'}
         value={paymentForm.value}
         error={!!error}
@@ -215,6 +235,7 @@ const TransactionForm: React.FC = () => {
       />
 
       <Input
+        type="picker"
         label={'Categoria:'}
         value={category.value}
         error={!!error}
@@ -225,6 +246,7 @@ const TransactionForm: React.FC = () => {
       />
 
       <Input
+        type="picker"
         label={'Sub Categoria:'}
         value={subCategory.value}
         error={!!error}
@@ -234,6 +256,24 @@ const TransactionForm: React.FC = () => {
         pickerList={subCategories}
       />
 
+      <Input
+        type="datePicker"
+        label={'Data:'}
+        datePickerValue={transaction.date}
+        onChangeDate={(date) =>
+          setTransaction((current) => ({...current, date}))
+        }
+      />
+
+      <Input
+        type="datePicker"
+        label={'Data do Pagamento:'}
+        datePickerValue={transaction.paymentDate}
+        onChangeDate={(paymentDate) =>
+          setTransaction((current) => ({...current, paymentDate}))
+        }
+      />
+
       {!transactionId && (
         <Button text="Cadastrar" onPress={handleAddRegister} />
       )}
@@ -241,6 +281,7 @@ const TransactionForm: React.FC = () => {
       {!!transactionId && (
         <Button text="Alterar" onPress={handleChangeRegister} />
       )}
+      <PaddingBotton />
     </Container>
   );
 };

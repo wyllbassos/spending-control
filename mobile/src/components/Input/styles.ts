@@ -36,3 +36,7 @@ export const PickerContainer = styled(Picker)<PickerProps>`
   color: #5636d3;
   align-self: center;
 `;
+
+export const DatePickerContainer = styled.View`
+  flex-direction: row;
+`;
