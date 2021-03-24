@@ -1,11 +1,17 @@
 import {useNavigation} from '@react-navigation/native';
 import React, {useCallback} from 'react';
+import {Container} from '../../styles';
 import Button from '../../components/Button';
+import {useThemes} from '../../hooks';
 
-import {Container} from './styles';
+// import {Container} from './styles';
 
 const Dashboard: React.FC = () => {
   const navigation = useNavigation();
+
+  const {
+    theme: {tercearyColor},
+  } = useThemes();
 
   const handleChangePage = useCallback(
     (route: string) => {
@@ -15,7 +21,9 @@ const Dashboard: React.FC = () => {
   );
 
   return (
-    <Container>
+    <Container
+      backgroundColor={tercearyColor}
+      style={{paddingHorizontal: 16, paddingVertical: 8}}>
       <Button
         text="Transações"
         onPress={() => handleChangePage('Transactions')}

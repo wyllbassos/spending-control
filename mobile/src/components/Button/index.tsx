@@ -1,5 +1,6 @@
 import React from 'react';
 import {TouchableOpacityProps} from 'react-native';
+import {useThemes} from '../../hooks';
 
 import {Container, ButtonText} from './styles';
 
@@ -15,9 +16,17 @@ const Button: React.FC<ButtonProps> = ({
   circle,
   ...props
 }) => {
+  const {
+    theme: {primaryColor, secundaryColor},
+  } = useThemes();
+
   return (
-    <Container {...props} circle={circle} style={style || {elevation: 8}}>
-      <ButtonText>
+    <Container
+      backgroundColor={primaryColor}
+      {...props}
+      circle={circle}
+      style={style || {elevation: 8}}>
+      <ButtonText color={secundaryColor}>
         {text}
         {children}
       </ButtonText>

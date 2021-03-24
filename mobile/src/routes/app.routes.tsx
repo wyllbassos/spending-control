@@ -9,6 +9,7 @@ import TransactionForm from '../pages/TransactionForm';
 import RegisterList from '../pages/RegisterList';
 
 import Logo from '../components/logo';
+import {useThemes} from '../hooks';
 
 const App = createStackNavigator();
 
@@ -53,23 +54,35 @@ const appScreens = [
   },
 ];
 
-const AppRoutes: React.FC = () => (
-  <App.Navigator initialRouteName="Dashboard">
-    {appScreens.map((screen) => (
-      <App.Screen
-        key={screen.key}
-        options={{
-          headerStyle: {
-            backgroundColor: '#5636d3',
-          },
-          headerTintColor: !!screen.key ? '#EBEEF8' : undefined,
-          headerTitle: screen.headerTitle,
-        }}
-        name={screen.name}
-        component={screen.component}
-      />
-    ))}
-  </App.Navigator>
-);
+const AppRoutes: React.FC = () => {
+  const {
+    theme: {primaryColor, secundaryColor, tercearyColor},
+  } = useThemes();
+  return (
+    <App.Navigator initialRouteName="Dashboard">
+      {appScreens.map((screen) => (
+        <App.Screen
+          key={screen.key}
+          options={{
+            headerStyle: {
+              backgroundColor: primaryColor,
+            },
+            headerTintColor: !!screen.key ? secundaryColor : undefined,
+            headerTitle: !!screen.key
+              ? screen.headerTitle
+              : () => (
+                  <Logo
+                    secundaryColor={secundaryColor}
+                    tercearyColor={tercearyColor}
+                  />
+                ),
+          }}
+          name={screen.name}
+          component={screen.component}
+        />
+      ))}
+    </App.Navigator>
+  );
+};
 
 export default AppRoutes;

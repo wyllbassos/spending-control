@@ -1,30 +1,32 @@
 import styled from 'styled-components/native';
 
-export const Container = styled.SafeAreaView`
-  flex: 1;
-  height: 100%;
-  align-items: center;
-`;
+interface ListRecordButtonrops {
+  backgroundColor: string;
+}
+
+interface ListRegisterTextProps {
+  color: string;
+}
 
 export const ListRecordContainer = styled.ScrollView`
   padding-top: 8px;
   width: 100%;
 `;
 
-export const ListRecordButton = styled.View`
+export const ListRecordButton = styled.View<ListRecordButtonrops>`
   flex-direction: row;
   align-items: center;
   flex: 1;
-  background-color: #fff;
+  background-color: ${({backgroundColor}) => backgroundColor};
   margin: 8px 16px;
   border-radius: 2px;
 `;
 
-export const ListRegisterText = styled.Text`
+export const ListRegisterText = styled.Text<ListRegisterTextProps>`
   flex: 1;
   margin: 8px 0 8px 16px;
   font-size: 20px;
-  color: #5636d3;
+  color: ${({color}) => color};
 `;
 
 export const ContainerIcon = styled.TouchableOpacity`

@@ -4,15 +4,16 @@ import {useNavigation} from '@react-navigation/native';
 
 import {format} from 'date-fns';
 
-import {useRegisters, useTransactions} from '../../hooks';
+import {useRegisters, useThemes, useTransactions} from '../../hooks';
 import formatValue from '../../utils/formatValue';
 
 import Button from '../../components/Button';
 
+import {Container} from '../../styles';
+
 // import formatValue from '../../utils/formatValue';
 
 import {
-  Container,
   ListTansactionsContainer,
   Transaction,
   TransactionData,
@@ -24,6 +25,10 @@ import {
 
 const TransactionsList: React.FC = () => {
   const navigation = useNavigation();
+
+  const {
+    theme: {primaryColor, secundaryColor, tercearyColor},
+  } = useThemes();
 
   const [selectedTransactionId, setSelectedTransactionId] = useState<string>();
 
@@ -98,18 +103,21 @@ const TransactionsList: React.FC = () => {
   );
 
   return (
-    <Container>
+    <Container backgroundColor={tercearyColor}>
       <ListTansactionsContainer contentInset={{bottom: 100}}>
         {transactions.map((transaction) => {
           if (selectedTransactionId !== transaction.id) {
             return (
               <Transaction
+                secundaryColor={secundaryColor}
                 key={transaction.id}
                 style={{elevation: 2}}
                 onPress={() => setSelectedTransactionId(transaction.id)}>
-                <TransactionData>
-                  <TransactionText>{transaction.description}</TransactionText>
-                  <TransactionText>
+                <TransactionData secundaryColor={secundaryColor}>
+                  <TransactionText primaryColor={primaryColor}>
+                    {transaction.description}
+                  </TransactionText>
+                  <TransactionText primaryColor={primaryColor}>
                     {formatValue(transaction.value)}
                   </TransactionText>
                 </TransactionData>
@@ -117,13 +125,13 @@ const TransactionsList: React.FC = () => {
                 <Icon
                   name="edit"
                   size={24}
-                  color="#5636d3"
+                  color={primaryColor}
                   onPress={() => handleSelectTransaction(transaction.id)}
                 />
                 <Icon
                   name="trash-2"
                   size={24}
-                  color="#5636d3"
+                  color={primaryColor}
                   onPress={() => handleDeleteTransaction(transaction.id)}
                 />
               </Transaction>
@@ -131,36 +139,39 @@ const TransactionsList: React.FC = () => {
           }
           return (
             <TransactionExpand
+              secundaryColor={secundaryColor}
               key={transaction.id}
               style={{elevation: 2}}
               onPress={() => setSelectedTransactionId(undefined)}>
-              <TransactionData>
-                <TransactionText>{transaction.description}</TransactionText>
-                <TransactionText>
+              <TransactionData secundaryColor={secundaryColor}>
+                <TransactionText primaryColor={primaryColor}>
+                  {transaction.description}
+                </TransactionText>
+                <TransactionText primaryColor={primaryColor}>
                   {formatValue(transaction.value)}
                 </TransactionText>
-                <TransactionText>
+                <TransactionText primaryColor={primaryColor}>
                   {handleGetRegisterRecord(
                     'payment-mode',
                     transaction.payment_form_id,
                   )}
                 </TransactionText>
-                <TransactionText>
+                <TransactionText primaryColor={primaryColor}>
                   {handleGetRegisterRecord(
                     'categories',
                     transaction.category_id,
                   )}
                 </TransactionText>
-                <TransactionText>
+                <TransactionText primaryColor={primaryColor}>
                   {handleGetRegisterRecord(
                     'sub-categories',
                     transaction.sub_category_id,
                   )}
                 </TransactionText>
-                <TransactionText>
+                <TransactionText primaryColor={primaryColor}>
                   {transaction.date && format(transaction.date, 'dd/MM/yyyy')}
                 </TransactionText>
-                <TransactionText>
+                <TransactionText primaryColor={primaryColor}>
                   {transaction.paymentDate &&
                     format(transaction.paymentDate, 'dd/MM/yyyy')}
                 </TransactionText>
@@ -168,13 +179,13 @@ const TransactionsList: React.FC = () => {
               <Icon
                 name="edit"
                 size={24}
-                color="#5636d3"
+                color={primaryColor}
                 onPress={() => handleSelectTransaction(transaction.id)}
               />
               <Icon
                 name="trash-2"
                 size={24}
-                color="#5636d3"
+                color={primaryColor}
                 onPress={() => handleDeleteTransaction(transaction.id)}
               />
             </TransactionExpand>

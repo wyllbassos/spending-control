@@ -3,20 +3,24 @@ import {useNavigation} from '@react-navigation/native';
 import Icons from 'react-native-vector-icons/Feather';
 import Button from '../../components/Button';
 
-import {useRegisters} from '../../hooks';
-
+import {useRegisters, useThemes} from '../../hooks';
+import {Container} from '../../styles';
 import {
-  Container,
   ListRecordContainer,
   ListRecordButton,
   ListRegisterText,
   ListBottonSpace,
   ContainerIcon,
 } from './styles';
+
 import {Alert} from 'react-native';
 
 const RegisterList: React.FC = () => {
   const navigation = useNavigation();
+
+  const {
+    theme: {primaryColor, secundaryColor, tercearyColor},
+  } = useThemes();
 
   const {
     registers,
@@ -71,16 +75,21 @@ const RegisterList: React.FC = () => {
   );
 
   return (
-    <Container>
+    <Container backgroundColor={tercearyColor}>
       <ListRecordContainer contentInset={{bottom: 100}}>
         {list.map((register) => (
-          <ListRecordButton key={register.id} style={{elevation: 2}}>
-            <ListRegisterText>{register.value}</ListRegisterText>
+          <ListRecordButton
+            backgroundColor={secundaryColor}
+            key={register.id}
+            style={{elevation: 2}}>
+            <ListRegisterText color={primaryColor}>
+              {register.value}
+            </ListRegisterText>
             <ContainerIcon onPress={() => handleSelectRegister(register.id)}>
-              <Icons name="edit" size={24} color="#5636d3" />
+              <Icons name="edit" size={24} color={primaryColor} />
             </ContainerIcon>
             <ContainerIcon onPress={() => handleDeleteRegister(register.id)}>
-              <Icons name="trash-2" size={24} color="#5636d3" />
+              <Icons name="trash-2" size={24} color={primaryColor} />
             </ContainerIcon>
           </ListRecordButton>
         ))}

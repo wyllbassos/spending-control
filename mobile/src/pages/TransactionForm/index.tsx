@@ -7,13 +7,15 @@ import {
   useRoute,
 } from '@react-navigation/native';
 
-import {useRegisters, useTransactions} from '../../hooks';
+import {useRegisters, useThemes, useTransactions} from '../../hooks';
 import {Transaction} from 'src/hooks/transactions';
 
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 
-import {Container, PaddingBotton} from './styles';
+import {Container} from '../../styles';
+
+import {PaddingBotton, Scroll} from './styles';
 import {Register} from '../../hooks/registers';
 
 interface RouteParams extends RouteProp<ParamListBase, string> {
@@ -25,6 +27,10 @@ const TransactionForm: React.FC = () => {
   const {params} = useRoute<RouteParams>();
   const transactionId = useMemo(() => params && params.transactionId, [params]);
   const navigation = useNavigation();
+
+  const {
+    theme: {tercearyColor},
+  } = useThemes();
 
   const [transaction, setTransaction] = useState<Transaction>({
     id: '',
@@ -205,83 +211,85 @@ const TransactionForm: React.FC = () => {
   );
 
   return (
-    <Container>
-      <Input
-        label={'Descrição:'}
-        value={transaction.description}
-        error={!!error}
-        onChangeText={(description) => {
-          setTransaction((current) => ({...current, description}));
-        }}
-      />
+    <Container backgroundColor={tercearyColor}>
+      <Scroll>
+        <Input
+          label={'Descrição:'}
+          value={transaction.description}
+          error={!!error}
+          onChangeText={(description) => {
+            setTransaction((current) => ({...current, description}));
+          }}
+        />
 
-      <Input
-        label={'Valor:'}
-        value={value}
-        error={!!error}
-        onChangeText={handleChangeValue}
-        keyboardType="numeric"
-      />
+        <Input
+          label={'Valor:'}
+          value={value}
+          error={!!error}
+          onChangeText={handleChangeValue}
+          keyboardType="numeric"
+        />
 
-      <Input
-        type="picker"
-        label={'Forma de Pagamento:'}
-        value={paymentForm.value}
-        error={!!error}
-        onValueChange={(itemValue) =>
-          handleChangePickers('payment-form', itemValue)
-        }
-        pickerList={paymentForms}
-      />
+        <Input
+          type="picker"
+          label={'Forma de Pagamento:'}
+          value={paymentForm.value}
+          error={!!error}
+          onValueChange={(itemValue) =>
+            handleChangePickers('payment-form', itemValue)
+          }
+          pickerList={paymentForms}
+        />
 
-      <Input
-        type="picker"
-        label={'Categoria:'}
-        value={category.value}
-        error={!!error}
-        onValueChange={(itemValue) =>
-          handleChangePickers('category', itemValue)
-        }
-        pickerList={categories}
-      />
+        <Input
+          type="picker"
+          label={'Categoria:'}
+          value={category.value}
+          error={!!error}
+          onValueChange={(itemValue) =>
+            handleChangePickers('category', itemValue)
+          }
+          pickerList={categories}
+        />
 
-      <Input
-        type="picker"
-        label={'Sub Categoria:'}
-        value={subCategory.value}
-        error={!!error}
-        onValueChange={(itemValue) =>
-          handleChangePickers('sub-category', itemValue)
-        }
-        pickerList={subCategories}
-      />
+        <Input
+          type="picker"
+          label={'Sub Categoria:'}
+          value={subCategory.value}
+          error={!!error}
+          onValueChange={(itemValue) =>
+            handleChangePickers('sub-category', itemValue)
+          }
+          pickerList={subCategories}
+        />
 
-      <Input
-        type="datePicker"
-        label={'Data:'}
-        datePickerValue={transaction.date}
-        onChangeDate={(date) =>
-          setTransaction((current) => ({...current, date}))
-        }
-      />
+        <Input
+          type="datePicker"
+          label={'Data:'}
+          datePickerValue={transaction.date}
+          onChangeDate={(date) =>
+            setTransaction((current) => ({...current, date}))
+          }
+        />
 
-      <Input
-        type="datePicker"
-        label={'Data do Pagamento:'}
-        datePickerValue={transaction.paymentDate}
-        onChangeDate={(paymentDate) =>
-          setTransaction((current) => ({...current, paymentDate}))
-        }
-      />
+        <Input
+          type="datePicker"
+          label={'Data do Pagamento:'}
+          datePickerValue={transaction.paymentDate}
+          onChangeDate={(paymentDate) =>
+            setTransaction((current) => ({...current, paymentDate}))
+          }
+        />
 
-      {!transactionId && (
-        <Button text="Cadastrar" onPress={handleAddRegister} />
-      )}
+        {!transactionId && (
+          <Button text="Cadastrar" onPress={handleAddRegister} />
+        )}
 
-      {!!transactionId && (
-        <Button text="Alterar" onPress={handleChangeRegister} />
-      )}
-      <PaddingBotton />
+        {!!transactionId && (
+          <Button text="Alterar" onPress={handleChangeRegister} />
+        )}
+        <PaddingBotton />
+      </Scroll>
     </Container>
   );
 };

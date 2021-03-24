@@ -2,12 +2,16 @@ import {useNavigation} from '@react-navigation/native';
 import React, {useCallback} from 'react';
 import Button from '../../components/Button';
 import {RegisterKeys} from '../../hooks/registers';
-import {useRegisters} from '../../hooks';
+import {useRegisters, useThemes} from '../../hooks';
 
-import {Container} from './styles';
+import {Container} from '../../styles';
 
 const Dashboard: React.FC = () => {
   const navigation = useNavigation();
+
+  const {
+    theme: {tercearyColor},
+  } = useThemes();
 
   const {setSelectedRegister} = useRegisters();
 
@@ -20,7 +24,9 @@ const Dashboard: React.FC = () => {
   );
 
   return (
-    <Container>
+    <Container
+      backgroundColor={tercearyColor}
+      style={{paddingHorizontal: 16, paddingVertical: 8}}>
       <Button
         text="Formas de Pagamentos"
         onPress={() => handleRegister('payment-modes')}

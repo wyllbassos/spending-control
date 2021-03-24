@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {Alert} from 'react-native';
-import {useRegisters} from '../../hooks';
+import {useRegisters, useThemes} from '../../hooks';
 import {
   ParamListBase,
   RouteProp,
@@ -11,7 +11,7 @@ import {
 import Button from '../../components/Button';
 import Input from '../../components/Input';
 
-import {Container} from './styles';
+import {Container} from '../../styles';
 
 interface RouteParams extends RouteProp<ParamListBase, string> {
   params: {
@@ -24,6 +24,10 @@ const RegisterForm: React.FC = () => {
   const registerId = useMemo(() => params && params.registerId, [params]);
 
   const navigation = useNavigation();
+
+  const {
+    theme: {primaryColor, secundaryColor, tercearyColor},
+  } = useThemes();
 
   const [inputValue, setInputValue] = useState('');
   const [error, setError] = useState<string>();
@@ -74,6 +78,10 @@ const RegisterForm: React.FC = () => {
   }, [addRegister, inputValue, navigation]);
 
   const handleChangeRegister = useCallback(async () => {
+    if (!handleCheckInputValue()) {
+      return;
+    }
+
     if (!selectedRegisterRecordId) {
       Alert.alert('Não Selecionado Registro para Alterar');
       return;
@@ -96,7 +104,7 @@ const RegisterForm: React.FC = () => {
   }, [inputValue]);
 
   return (
-    <Container>
+    <Container backgroundColor={tercearyColor} style={{padding: 16}}>
       <Input
         label={`Nome da ${registerDescriptions.singular}:`}
         value={inputValue}

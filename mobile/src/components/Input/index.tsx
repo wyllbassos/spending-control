@@ -13,6 +13,7 @@ import {
 
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {format} from 'date-fns';
+import {useThemes} from '../../hooks';
 
 interface InputProps extends TextInputProps {
   type?: 'text' | 'picker' | 'datePicker';
@@ -49,6 +50,10 @@ const Input: React.FC<InputProps> = ({
   datePickerValue,
   ...rest
 }) => {
+  const {
+    theme: {primaryColor},
+  } = useThemes();
+
   const [isFocused, setIsFocused] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
 
@@ -76,17 +81,19 @@ const Input: React.FC<InputProps> = ({
 
   return (
     <Container
+      primaryColor={primaryColor}
       style={pickerList && !error ? {borderBottomWidth: 0} : containerStyle}
       isFocused={isFocused}
       isErrored={!!error}
       isFilled={!!value}>
-      {label && <InputLabel>{label}</InputLabel>}
+      {label && <InputLabel primaryColor={primaryColor}>{label}</InputLabel>}
 
       {children}
 
       {(type === 'text' || !type) && (
         <>
           <TextInput
+            primaryColor={primaryColor}
             style={style}
             value={value}
             onFocus={handleInputFocus}
@@ -98,11 +105,17 @@ const Input: React.FC<InputProps> = ({
 
       {pickerList && type === 'picker' && (
         <PickerContainer
+          primaryColor={primaryColor}
           pickerWidth={windowDimensions.width / 1.5 + 'px'}
           selectedValue={value}
           onValueChange={onValueChange}>
           {pickerList.map(({value, id}) => (
-            <Picker.Item color="#5636d3" key={id} label={value} value={value} />
+            <Picker.Item
+              color={primaryColor}
+              key={id}
+              label={value}
+              value={value}
+            />
           ))}
         </PickerContainer>
       )}
@@ -111,12 +124,13 @@ const Input: React.FC<InputProps> = ({
         <DatePickerContainer>
           <Icon
             name="calendar"
-            color="#5636d3"
+            color={primaryColor}
             size={32}
             onPress={handleOpenDatePicker}
             style={{margin: 8}}
           />
           <TextInput
+            primaryColor={primaryColor}
             editable={false}
             value={datePickerValue ? selectedDate.string : ''}
           />
