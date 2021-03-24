@@ -29,7 +29,7 @@ export interface ThemesContextProps {
   changeTheme: (theme: ThemeProps) => Promise<boolean>;
   removeTheme: (id: string) => Promise<boolean>;
   selectedTheme: number;
-  setSelectedTheme: React.Dispatch<React.SetStateAction<number>>;
+  handleChangeTheme: (id: number) => Promise<void>;
 }
 
 export const ThemesContext = createContext<ThemesContextProps | null>(null);
@@ -62,8 +62,14 @@ const defautThemes: ThemeProps[] = [
   {
     id: '4',
     primaryColor: '#FFF',
-    secundaryColor: '#5636d3',
-    tercearyColor: '#000',
+    secundaryColor: '#000',
+    tercearyColor: '#5636d3',
+  },
+  {
+    id: '5',
+    primaryColor: '#000',
+    secundaryColor: '#FFF',
+    tercearyColor: '#5636d3',
   },
 ];
 
@@ -78,9 +84,13 @@ const ThemesProvider: React.FC = ({children}) => {
         const {storageSelectedTheme, storageThemes} = JSON.parse(
           storageThemesStr,
         ) as ThemesStorageProps;
+        console.log(
+          storageSelectedTheme,
+          storageThemes[Number(storageSelectedTheme)],
+        );
         setSelectedTheme(Number(storageSelectedTheme));
-        setThemes(storageThemes);
-        setTheme(storageThemes[storageSelectedTheme]);
+        setTheme({...storageThemes[Number(storageSelectedTheme)]});
+        setThemes({...storageThemes});
       }
     });
   }, []);
@@ -179,6 +189,31 @@ const ThemesProvider: React.FC = ({children}) => {
     [themes, selectedTheme],
   );
 
+  const handleChangeTheme = useCallback(
+    async (index: number): Promise<void> => {
+      // const index = themes.findIndex((theme) => theme.id === id);
+
+      // console.log(id, index);
+
+      // if (index < 0) {
+      //   Alert.alert('Tema Não Localizado');
+      //   return;
+      // }
+      setSelectedTheme(index);
+      console.log({...themes[index]});
+      setTheme({...themes[index]});
+
+      await AsyncStorage.setItem(
+        'gofinances@themes',
+        JSON.stringify({
+          storageThemes: themes,
+          storageSelectedTheme: index,
+        } as ThemesStorageProps),
+      );
+    },
+    [themes],
+  );
+
   const value: ThemesContextProps = React.useMemo(
     () => ({
       theme,
@@ -187,7 +222,7 @@ const ThemesProvider: React.FC = ({children}) => {
       changeTheme,
       removeTheme,
       selectedTheme,
-      setSelectedTheme,
+      handleChangeTheme,
     }),
     [
       themes,
@@ -195,7 +230,7 @@ const ThemesProvider: React.FC = ({children}) => {
       changeTheme,
       removeTheme,
       selectedTheme,
-      setSelectedTheme,
+      handleChangeTheme,
     ],
   );
 
