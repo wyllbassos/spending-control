@@ -8,20 +8,11 @@ import {useRegisters, useThemes, useTransactions} from '../../hooks';
 import formatValue from '../../utils/formatValue';
 
 import Button from '../../components/Button';
+import ListItem from '../../components/ListItem';
 
 import {Container} from '../../styles';
 
-// import formatValue from '../../utils/formatValue';
-
-import {
-  ListTansactionsContainer,
-  Transaction,
-  TransactionData,
-  TransactionExpand,
-  TransactionText,
-  Icon,
-  ListBottonSpace,
-} from './styles';
+import {ListTansactionsContainer, Icon, ListBottonSpace} from './styles';
 
 const TransactionsList: React.FC = () => {
   const navigation = useNavigation();
@@ -102,93 +93,55 @@ const TransactionsList: React.FC = () => {
     [paymentForms, categories, subCategories],
   );
 
+  const textsForListItems = useMemo(() => {
+    return transactions.map((transaction) => {
+      return {
+        unSelected: [transaction.description, formatValue(transaction.value)],
+        selected: [
+          transaction.description,
+          formatValue(transaction.value),
+          handleGetRegisterRecord('payment-mode', transaction.payment_form_id),
+          handleGetRegisterRecord('categories', transaction.category_id),
+          handleGetRegisterRecord(
+            'sub-categories',
+            transaction.sub_category_id,
+          ),
+          (transaction.date && format(transaction.date, 'dd/MM/yyyy')) ||
+            '  /  /  ',
+          (transaction.paymentDate &&
+            format(transaction.paymentDate, 'dd/MM/yyyy')) ||
+            '  /  /  ',
+        ],
+      };
+    });
+  }, [transactions]);
+
   return (
     <Container backgroundColor={tercearyColor}>
       <ListTansactionsContainer contentInset={{bottom: 100}}>
-        {transactions.map((transaction) => {
-          if (selectedTransactionId !== transaction.id) {
-            return (
-              <Transaction
-                secundaryColor={secundaryColor}
-                key={transaction.id}
-                style={{elevation: 2}}
-                onPress={() => setSelectedTransactionId(transaction.id)}>
-                <TransactionData secundaryColor={secundaryColor}>
-                  <TransactionText primaryColor={primaryColor}>
-                    {transaction.description}
-                  </TransactionText>
-                  <TransactionText primaryColor={primaryColor}>
-                    {formatValue(transaction.value)}
-                  </TransactionText>
-                </TransactionData>
-
-                <Icon
-                  name="edit"
-                  size={24}
-                  color={primaryColor}
-                  onPress={() => handleSelectTransaction(transaction.id)}
-                />
-                <Icon
-                  name="trash-2"
-                  size={24}
-                  color={primaryColor}
-                  onPress={() => handleDeleteTransaction(transaction.id)}
-                />
-              </Transaction>
-            );
-          }
+        {transactions.map((transaction, index) => {
           return (
-            <TransactionExpand
-              secundaryColor={secundaryColor}
+            <ListItem
               key={transaction.id}
-              style={{elevation: 2}}
-              onPress={() => setSelectedTransactionId(undefined)}>
-              <TransactionData secundaryColor={secundaryColor}>
-                <TransactionText primaryColor={primaryColor}>
-                  {transaction.description}
-                </TransactionText>
-                <TransactionText primaryColor={primaryColor}>
-                  {formatValue(transaction.value)}
-                </TransactionText>
-                <TransactionText primaryColor={primaryColor}>
-                  {handleGetRegisterRecord(
-                    'payment-mode',
-                    transaction.payment_form_id,
-                  )}
-                </TransactionText>
-                <TransactionText primaryColor={primaryColor}>
-                  {handleGetRegisterRecord(
-                    'categories',
-                    transaction.category_id,
-                  )}
-                </TransactionText>
-                <TransactionText primaryColor={primaryColor}>
-                  {handleGetRegisterRecord(
-                    'sub-categories',
-                    transaction.sub_category_id,
-                  )}
-                </TransactionText>
-                <TransactionText primaryColor={primaryColor}>
-                  {transaction.date && format(transaction.date, 'dd/MM/yyyy')}
-                </TransactionText>
-                <TransactionText primaryColor={primaryColor}>
-                  {transaction.paymentDate &&
-                    format(transaction.paymentDate, 'dd/MM/yyyy')}
-                </TransactionText>
-              </TransactionData>
-              <Icon
-                name="edit"
-                size={24}
-                color={primaryColor}
-                onPress={() => handleSelectTransaction(transaction.id)}
-              />
-              <Icon
-                name="trash-2"
-                size={24}
-                color={primaryColor}
-                onPress={() => handleDeleteTransaction(transaction.id)}
-              />
-            </TransactionExpand>
+              text={
+                selectedTransactionId !== transaction.id
+                  ? textsForListItems[index].unSelected
+                  : textsForListItems[index].selected
+              }
+              onPress={() =>
+                setSelectedTransactionId(
+                  selectedTransactionId !== transaction.id
+                    ? transaction.id
+                    : undefined,
+                )
+              }
+              buttonTrash={{
+                onPress: () => handleDeleteTransaction(transaction.id),
+              }}
+              buttonEdit={{
+                onPress: () => handleSelectTransaction(transaction.id),
+              }}
+            />
           );
         })}
         <ListBottonSpace />
@@ -198,7 +151,7 @@ const TransactionsList: React.FC = () => {
         onPress={() => navigation.navigate('Transaction-form')}
         circle="64px"
         style={{position: 'absolute', bottom: 8}}>
-        <Icon name="plus" size={32} color="#FFF" />
+        <Icon name="plus" size={32} color={secundaryColor} />
       </Button>
     </Container>
   );

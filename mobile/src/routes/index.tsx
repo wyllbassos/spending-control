@@ -11,7 +11,10 @@ const Routes: React.FC = () => {
 
   return (
     <View style={{flex: 1}}>
-      <StatusBar barStyle="light-content" backgroundColor={primaryColor} />
+      <StatusBar
+        barStyle={primaryColor === '#FFF' ? 'dark-content' : 'light-content'}
+        backgroundColor={primaryColor}
+      />
       <AppRoutes />
     </View>
   );

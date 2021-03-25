@@ -44,7 +44,7 @@ const defautThemes: ThemeProps[] = [
   {
     id: '1',
     primaryColor: '#FF872C',
-    secundaryColor: '#FFF',
+    secundaryColor: '#000',
     tercearyColor: '#ebeef8',
   },
   {
@@ -74,7 +74,12 @@ const defautThemes: ThemeProps[] = [
 ];
 
 const ThemesProvider: React.FC = ({children}) => {
-  const [theme, setTheme] = useState<ThemeProps>(defautThemes[0]);
+  const [theme, setTheme] = useState<ThemeProps>({
+    id: '0',
+    primaryColor: '#FFF',
+    secundaryColor: '#FFF',
+    tercearyColor: '#FFF',
+  });
   const [themes, setThemes] = useState<ThemeProps[]>(defautThemes);
   const [selectedTheme, setSelectedTheme] = useState(0);
 
