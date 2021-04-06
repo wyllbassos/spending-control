@@ -15,6 +15,7 @@ export type RegisterKeys = 'payment-modes' | 'categories' | 'sub-categories';
 export interface Register {
   id: string;
   value: string;
+  type?: 'CREDITO' | 'DEBITO';
 }
 
 export interface Registers {
@@ -31,9 +32,9 @@ export interface RegistersContextProps {
     plural: string;
   };
   registers: Registers;
-  addRegister: (value: string) => Promise<boolean>;
+  addRegister: (newRegister: Omit<Register, 'id'>) => Promise<boolean>;
   removeRegister: (id: string) => Promise<boolean>;
-  changeRegister: (id: string, value: string) => Promise<boolean>;
+  changeRegister: (newRegister: Register) => Promise<boolean>;
 }
 
 export const RegistersContext = createContext<RegistersContextProps | null>(
@@ -70,14 +71,15 @@ const RegistersProvider: React.FC = ({children}) => {
   );
 
   const addRegister = useCallback(
-    async (value: string): Promise<boolean> => {
+    async (newRegister): Promise<boolean> => {
+      const {value, type} = newRegister;
       const list = registers[selectedRegister];
 
       const lastIndex = list.length - 1;
       const lastRegister = list[lastIndex];
       const newIndex = lastRegister ? Number(lastRegister.id) + 1 : 0;
       const id = String(newIndex);
-      const record = {id, value: value.toUpperCase()};
+      const record = {id, value: value.toUpperCase(), type};
       const newRegisters = {
         ...registers,
         [selectedRegister]: [...list, record],
@@ -96,9 +98,10 @@ const RegistersProvider: React.FC = ({children}) => {
   );
 
   const changeRegister = useCallback(
-    async (id: string, value: string): Promise<boolean> => {
-      const newRegistersToDelete = [...registers[selectedRegister]];
-      const index = newRegistersToDelete.findIndex(
+    async (newRegister: Register): Promise<boolean> => {
+      const {id, value, type} = newRegister;
+      const newRegistersToEdit = [...registers[selectedRegister]];
+      const index = newRegistersToEdit.findIndex(
         (register) => register.id === id,
       );
 
@@ -107,11 +110,12 @@ const RegistersProvider: React.FC = ({children}) => {
         return false;
       }
 
-      newRegistersToDelete[index].value = value.toUpperCase();
+      newRegistersToEdit[index].value = value.toLocaleUpperCase();
+      newRegistersToEdit[index].type = type;
 
       const newRegisters = {
         ...registers,
-        [selectedRegister]: newRegistersToDelete,
+        [selectedRegister]: newRegistersToEdit,
       };
 
       await AsyncStorage.setItem(

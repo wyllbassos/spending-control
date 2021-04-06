@@ -30,6 +30,7 @@ const RegisterForm: React.FC = () => {
   } = useThemes();
 
   const [inputValue, setInputValue] = useState('');
+  const [typeValue, setTypeValue] = useState<'CREDITO' | 'DEBITO'>();
   const [error, setError] = useState<string>();
 
   const {
@@ -48,7 +49,7 @@ const RegisterForm: React.FC = () => {
 
   useEffect(() => {
     if (!!error) setError(undefined);
-  }, [inputValue]);
+  }, [inputValue, typeValue]);
 
   const list = useMemo(() => registers[selectedRegister], [
     registers,
@@ -58,24 +59,44 @@ const RegisterForm: React.FC = () => {
   const selectedRegisterRecordId = useMemo(() => {
     if (registerId) {
       const selectedRegister = list.find((item) => item.id === registerId);
+
       if (selectedRegister) {
         setInputValue(selectedRegister.value);
+        setTypeValue(selectedRegister.type);
       }
       return registerId;
     }
     return undefined;
   }, [registerId]);
 
+  const handleCheckInputValue = useCallback(() => {
+    if (!inputValue) {
+      const errorText = 'Nome deve ser preenchido.';
+      Alert.alert('Erro ao Cadastrar', errorText);
+      setError(errorText);
+      return false;
+    }
+
+    if (selectedRegister === 'payment-modes' && !typeValue) {
+      const errorText = 'Tipo deve ser preenchido.';
+      Alert.alert('Erro ao Cadastrar', errorText);
+      setError(errorText);
+      return false;
+    }
+
+    return true;
+  }, [inputValue, typeValue, selectedRegister]);
+
   const handleAddRegister = useCallback(async () => {
     if (!handleCheckInputValue()) {
       return;
     }
 
-    const ok = await addRegister(inputValue);
+    const ok = await addRegister({value: inputValue, type: typeValue});
 
     if (ok) navigation.goBack();
     else Alert.alert('erro ao incluir');
-  }, [addRegister, inputValue, navigation]);
+  }, [handleCheckInputValue, addRegister, inputValue, typeValue, navigation]);
 
   const handleChangeRegister = useCallback(async () => {
     if (!handleCheckInputValue()) {
@@ -87,21 +108,21 @@ const RegisterForm: React.FC = () => {
       return;
     }
 
-    const ok = await changeRegister(selectedRegisterRecordId, inputValue);
+    const ok = await changeRegister({
+      id: selectedRegisterRecordId,
+      value: inputValue,
+      type: typeValue,
+    });
 
     if (ok) navigation.goBack();
     else Alert.alert('erro ao alterar');
-  }, [selectedRegisterRecordId, changeRegister, inputValue, navigation]);
-
-  const handleCheckInputValue = useCallback(() => {
-    if (!inputValue) {
-      const errorText = 'Nome deve ser preenchido.';
-      Alert.alert('Erro ao Cadastrar', errorText);
-      setError(errorText);
-      return false;
-    }
-    return true;
-  }, [inputValue]);
+  }, [
+    handleCheckInputValue,
+    selectedRegisterRecordId,
+    changeRegister,
+    inputValue,
+    navigation,
+  ]);
 
   return (
     <Container backgroundColor={tercearyColor} style={{padding: 16}}>
@@ -111,6 +132,21 @@ const RegisterForm: React.FC = () => {
         error={!!error}
         onChangeText={setInputValue}
       />
+
+      {selectedRegister === 'payment-modes' && (
+        <Input
+          type="picker"
+          label={'Tipo:'}
+          value={typeValue}
+          error={!!error}
+          onValueChange={setTypeValue}
+          pickerList={[
+            {value: '', id: '0'},
+            {value: 'CREDITO', id: '1'},
+            {value: 'DEBITO', id: '2'},
+          ]}
+        />
+      )}
 
       {!selectedRegisterRecordId && (
         <Button text="Cadastrar" onPress={handleAddRegister} />

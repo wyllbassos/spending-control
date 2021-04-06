@@ -13,6 +13,7 @@ import ListItem from '../../components/ListItem';
 import {Container} from '../../styles';
 
 import {ListTansactionsContainer, Icon, ListBottonSpace} from './styles';
+import {Register, RegisterKeys} from '../../hooks/registers';
 
 const TransactionsList: React.FC = () => {
   const navigation = useNavigation();
@@ -65,28 +66,16 @@ const TransactionsList: React.FC = () => {
     [transactions],
   );
 
-  const handleGetRegisterRecord = useCallback(
-    (register, id): string => {
-      if (register === 'payment-mode') {
-        const paymentMode = paymentForms.find((item) => item.id === id);
-        if (paymentMode) {
-          return paymentMode.value;
+  const getRegisterRecord = useCallback(
+    (registerKey: RegisterKeys, id): string => {
+      const register = registers[registerKey].find((item) => item.id === id);
+      if (register) {
+        if (registerKey === 'payment-modes') {
+          return `${register.value}${
+            register.type ? ` - ${register.type}` : ''
+          }`;
         }
-        return '';
-      }
-      if (register === 'categories') {
-        const category = categories.find((item) => item.id === id);
-        if (category) {
-          return category.value;
-        }
-        return '';
-      }
-      if (register === 'sub-categories') {
-        const subCategory = subCategories.find((item) => item.id === id);
-        if (subCategory) {
-          return subCategory.value;
-        }
-        return '';
+        return register.value;
       }
       return '';
     },
@@ -95,22 +84,28 @@ const TransactionsList: React.FC = () => {
 
   const textsForListItems = useMemo(() => {
     return transactions.map((transaction) => {
+      const {
+        category_id,
+        payment_form_id,
+        sub_category_id,
+        value,
+        description,
+        date,
+        paymentDate,
+      } = transaction;
+      const paymentMode = getRegisterRecord('payment-modes', payment_form_id);
+      const category = getRegisterRecord('categories', category_id);
+      const subCatgegory = getRegisterRecord('sub-categories', sub_category_id);
       return {
-        unSelected: [transaction.description, formatValue(transaction.value)],
+        unSelected: [description, formatValue(value)],
         selected: [
-          transaction.description,
-          formatValue(transaction.value),
-          handleGetRegisterRecord('payment-mode', transaction.payment_form_id),
-          handleGetRegisterRecord('categories', transaction.category_id),
-          handleGetRegisterRecord(
-            'sub-categories',
-            transaction.sub_category_id,
-          ),
-          (transaction.date && format(transaction.date, 'dd/MM/yyyy')) ||
-            '  /  /  ',
-          (transaction.paymentDate &&
-            format(transaction.paymentDate, 'dd/MM/yyyy')) ||
-            '  /  /  ',
+          description,
+          formatValue(value),
+          paymentMode,
+          category,
+          subCatgegory,
+          (date && format(date, 'dd/MM/yyyy')) || '  /  /  ',
+          (paymentDate && format(paymentDate, 'dd/MM/yyyy')) || '  /  /  ',
         ],
       };
     });

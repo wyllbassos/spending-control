@@ -15,7 +15,14 @@ import Input from '../../components/Input';
 
 import {Container} from '../../styles';
 
-import {PaddingBotton, Scroll} from './styles';
+import {
+  PaddingBotton,
+  PaymentType,
+  PaymentTypeContainer,
+  PaymentTypeText,
+  Scroll,
+  ValueContent,
+} from './styles';
 import {Register} from '../../hooks/registers';
 
 interface RouteParams extends RouteProp<ParamListBase, string> {
@@ -47,6 +54,8 @@ const TransactionForm: React.FC = () => {
   const [subCategory, setSubCategory] = useState<Register>({id: '', value: ''});
   // const [description, setDescription] = useState('');
   const [error, setError] = useState<string>();
+
+  const [income, setIncome] = useState(false);
 
   const {registers} = useRegisters();
   const {transactions, addTransaction, changeTransaction} = useTransactions();
@@ -222,13 +231,27 @@ const TransactionForm: React.FC = () => {
           }}
         />
 
-        <Input
-          label={'Valor:'}
-          value={value}
-          error={!!error}
-          onChangeText={handleChangeValue}
-          keyboardType="numeric"
-        />
+        <ValueContent>
+          <Input
+            containerStyle={{width: '70%'}}
+            label={'Valor:'}
+            value={value}
+            error={!!error}
+            onChangeText={handleChangeValue}
+            keyboardType="numeric"
+          />
+
+          <PaymentTypeContainer>
+            <PaymentTypeText>{income ? 'Entrada' : 'Saida'}</PaymentTypeText>
+            <PaymentType
+              trackColor={{false: '#767577', true: '#81b0ff'}}
+              thumbColor={income ? '#0F0' : '#F00'}
+              ios_backgroundColor="#3e3e3e"
+              onValueChange={() => setIncome(!income)}
+              value={income}
+            />
+          </PaymentTypeContainer>
+        </ValueContent>
 
         <Input
           type="picker"
@@ -240,7 +263,6 @@ const TransactionForm: React.FC = () => {
           }
           pickerList={paymentForms}
         />
-
         <Input
           type="picker"
           label={'Categoria:'}
@@ -251,7 +273,6 @@ const TransactionForm: React.FC = () => {
           }
           pickerList={categories}
         />
-
         <Input
           type="picker"
           label={'Sub Categoria:'}
@@ -262,7 +283,6 @@ const TransactionForm: React.FC = () => {
           }
           pickerList={subCategories}
         />
-
         <Input
           type="datePicker"
           label={'Data:'}
@@ -271,7 +291,6 @@ const TransactionForm: React.FC = () => {
             setTransaction((current) => ({...current, date}))
           }
         />
-
         <Input
           type="datePicker"
           label={'Data do Pagamento:'}
@@ -280,11 +299,9 @@ const TransactionForm: React.FC = () => {
             setTransaction((current) => ({...current, paymentDate}))
           }
         />
-
         {!transactionId && (
           <Button text="Cadastrar" onPress={handleAddRegister} />
         )}
-
         {!!transactionId && (
           <Button text="Alterar" onPress={handleChangeRegister} />
         )}

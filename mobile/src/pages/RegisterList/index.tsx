@@ -72,12 +72,12 @@ const RegisterList: React.FC = () => {
   return (
     <Container backgroundColor={tercearyColor}>
       <ListRecordContainer contentInset={{bottom: 100}}>
-        {list.map((register) => (
+        {list.map(({id, value, type}) => (
           <ListItem
-            key={register.id}
-            text={register.value}
-            buttonTrash={{onPress: () => handleDeleteRegister(register.id)}}
-            buttonEdit={{onPress: () => handleSelectRegister(register.id)}}
+            key={id}
+            text={`${value}${type ? `\n${type}` : ''}`}
+            buttonTrash={{onPress: () => handleDeleteRegister(id)}}
+            buttonEdit={{onPress: () => handleSelectRegister(id)}}
           />
         ))}
         <ListBottonSpace />
