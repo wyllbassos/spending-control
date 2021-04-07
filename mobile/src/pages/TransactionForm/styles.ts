@@ -1,7 +1,7 @@
 import styled from 'styled-components/native';
 
 export const Scroll = styled.ScrollView`
-  padding: 16px;
+  padding-top: 16px;
   width: 100%;
 `;
 
@@ -10,18 +10,9 @@ export const PaddingBotton = styled.View`
   height: 32px;
 `;
 
-export const ValueContent = styled.View`
-  flex-direction: row;
-  align-items: center;
+export const PaymentTypeText = styled.Text<{color: string}>`
+  align-self: center;
+  font-size: 16px;
+  margin: 16px 0;
+  color: ${({color}) => color};
 `;
-
-export const PaymentTypeContainer = styled.View`
-  justify-content: center;
-  align-items: center;
-  width: 64px;
-  margin-right: 24px;
-`;
-
-export const PaymentType = styled.Switch``;
-
-export const PaymentTypeText = styled.Text``;

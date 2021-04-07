@@ -15,8 +15,8 @@ interface PickerProps extends PrimaryColor {
 }
 
 export const Container = styled.View<ContainerProps>`
-  width: 100%;
-  margin: 8px 0;
+  width: 92%;
+  margin: 3% 4%;
 
   border-bottom-width: 2px;
   border-bottom-color: ${({isErrored, isFocused, isFilled, primaryColor}) =>

@@ -45,11 +45,11 @@ const ListItem: React.FC<ListItemProps> = ({
 
   return (
     <Container
-      {...props}
       disabled={!onPress}
       onPress={onPress}
       backgroundColor={secundaryColor}
-      style={{elevation: 2}}>
+      style={{elevation: 2}}
+      {...props}>
       {textItem && <Text color={primaryColor}>{textItem}</Text>}
 
       {!!children && children}

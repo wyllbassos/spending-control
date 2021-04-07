@@ -15,15 +15,9 @@ import Input from '../../components/Input';
 
 import {Container} from '../../styles';
 
-import {
-  PaddingBotton,
-  PaymentType,
-  PaymentTypeContainer,
-  PaymentTypeText,
-  Scroll,
-  ValueContent,
-} from './styles';
+import {PaddingBotton, PaymentTypeText, Scroll} from './styles';
 import {Register} from '../../hooks/registers';
+import formatValue from '../../utils/formatValue';
 
 interface RouteParams extends RouteProp<ParamListBase, string> {
   params: {
@@ -36,7 +30,7 @@ const TransactionForm: React.FC = () => {
   const navigation = useNavigation();
 
   const {
-    theme: {tercearyColor},
+    theme: {primaryColor, tercearyColor},
   } = useThemes();
 
   const [transaction, setTransaction] = useState<Transaction>({
@@ -46,6 +40,8 @@ const TransactionForm: React.FC = () => {
     payment_form_id: '',
     category_id: '',
     sub_category_id: '',
+    type: 'income',
+    date: new Date(),
   });
 
   const [value, setValue] = useState('');
@@ -55,7 +51,10 @@ const TransactionForm: React.FC = () => {
   // const [description, setDescription] = useState('');
   const [error, setError] = useState<string>();
 
-  const [income, setIncome] = useState(false);
+  const [income, setIncome] = useState<number>();
+  const [transactionType, setTransactionType] = useState<
+    'Entrada' | 'Saída' | 'Transferência'
+  >();
 
   const {registers} = useRegisters();
   const {transactions, addTransaction, changeTransaction} = useTransactions();
@@ -147,7 +146,7 @@ const TransactionForm: React.FC = () => {
     if (!transaction.date) {
       errorText += 'Data\n';
     }
-    if (!transaction.paymentDate) {
+    if (!transaction.paymentDate && paymentForm.type === 'CREDITO') {
       errorText += 'Data de Pagamento\n';
     }
 
@@ -175,11 +174,9 @@ const TransactionForm: React.FC = () => {
   }, []);
 
   const handleChangePickers = useCallback(
-    (picker, valuePicker) => {
+    (picker, idPicker: number) => {
       if (picker === 'payment-form') {
-        const paymantForm = paymentForms.find(
-          (item) => item.value === valuePicker,
-        );
+        const paymantForm = paymentForms[idPicker];
         if (paymantForm) {
           setPaymentForm(paymantForm);
           setTransaction((current) => ({
@@ -191,7 +188,7 @@ const TransactionForm: React.FC = () => {
       }
 
       if (picker === 'category') {
-        const category = categories.find((item) => item.value === valuePicker);
+        const category = categories[idPicker];
         if (category) {
           setCategory(category);
           setTransaction((current) => ({
@@ -203,9 +200,7 @@ const TransactionForm: React.FC = () => {
       }
 
       if (picker === 'sub-category') {
-        const subCategory = subCategories.find(
-          (item) => item.value === valuePicker,
-        );
+        const subCategory = subCategories[idPicker];
         if (subCategory) {
           setSubCategory(subCategory);
           setTransaction((current) => ({
@@ -219,21 +214,55 @@ const TransactionForm: React.FC = () => {
     [paymentForms, categories, subCategories],
   );
 
+  const handleSetTransactionType = useCallback(
+    (newTransactionType: 'Entrada' | 'Saída' | 'Transferência') => {
+      setTransactionType(newTransactionType);
+      setTransaction((current) => ({
+        ...current,
+        type: newTransactionType === 'Saída' ? 'outcome' : 'income',
+      }));
+    },
+    [],
+  );
+
   return (
     <Container backgroundColor={tercearyColor}>
-      <Scroll>
-        <Input
-          label={'Descrição:'}
-          value={transaction.description}
-          error={!!error}
-          onChangeText={(description) => {
-            setTransaction((current) => ({...current, description}));
-          }}
-        />
+      {transactionType === undefined && (
+        <>
+          <Button
+            text="Saída"
+            onPress={() => handleSetTransactionType('Saída')}
+          />
 
-        <ValueContent>
+          <Button
+            text="Entrada"
+            onPress={() => handleSetTransactionType('Entrada')}
+          />
+
+          <Button
+            text="Transferência"
+            onPress={() => handleSetTransactionType('Transferência')}
+          />
+        </>
+      )}
+      {transactionType !== undefined && (
+        <Scroll>
+          <PaymentTypeText color={primaryColor}>
+            {!!transaction.value ? formatValue(transaction.value) : 'R$ 0,00'}
+            {transactionType === 'Entrada' ? ' -> ' : ' <- '}
+            {`${paymentForm.value} - ${paymentForm.type}`}
+          </PaymentTypeText>
+
           <Input
-            containerStyle={{width: '70%'}}
+            label={'Descrição:'}
+            value={transaction.description}
+            error={!!error}
+            onChangeText={(description) => {
+              setTransaction((current) => ({...current, description}));
+            }}
+          />
+
+          <Input
             label={'Valor:'}
             value={value}
             error={!!error}
@@ -241,72 +270,73 @@ const TransactionForm: React.FC = () => {
             keyboardType="numeric"
           />
 
-          <PaymentTypeContainer>
-            <PaymentTypeText>{income ? 'Entrada' : 'Saida'}</PaymentTypeText>
-            <PaymentType
-              trackColor={{false: '#767577', true: '#81b0ff'}}
-              thumbColor={income ? '#0F0' : '#F00'}
-              ios_backgroundColor="#3e3e3e"
-              onValueChange={() => setIncome(!income)}
-              value={income}
-            />
-          </PaymentTypeContainer>
-        </ValueContent>
+          <Input
+            type="picker"
+            label={'Forma de Pagamento:'}
+            value={`${paymentForm.value} - ${paymentForm.type}`}
+            error={!!error}
+            onValueChange={(itemValue, index) =>
+              handleChangePickers('payment-form', index)
+            }
+            pickerList={paymentForms.map((paymentFormMap) => ({
+              ...paymentFormMap,
+              value: `${paymentFormMap.value} - ${paymentFormMap.type}`,
+            }))}
+          />
 
-        <Input
-          type="picker"
-          label={'Forma de Pagamento:'}
-          value={paymentForm.value}
-          error={!!error}
-          onValueChange={(itemValue) =>
-            handleChangePickers('payment-form', itemValue)
-          }
-          pickerList={paymentForms}
-        />
-        <Input
-          type="picker"
-          label={'Categoria:'}
-          value={category.value}
-          error={!!error}
-          onValueChange={(itemValue) =>
-            handleChangePickers('category', itemValue)
-          }
-          pickerList={categories}
-        />
-        <Input
-          type="picker"
-          label={'Sub Categoria:'}
-          value={subCategory.value}
-          error={!!error}
-          onValueChange={(itemValue) =>
-            handleChangePickers('sub-category', itemValue)
-          }
-          pickerList={subCategories}
-        />
-        <Input
-          type="datePicker"
-          label={'Data:'}
-          datePickerValue={transaction.date}
-          onChangeDate={(date) =>
-            setTransaction((current) => ({...current, date}))
-          }
-        />
-        <Input
-          type="datePicker"
-          label={'Data do Pagamento:'}
-          datePickerValue={transaction.paymentDate}
-          onChangeDate={(paymentDate) =>
-            setTransaction((current) => ({...current, paymentDate}))
-          }
-        />
-        {!transactionId && (
-          <Button text="Cadastrar" onPress={handleAddRegister} />
-        )}
-        {!!transactionId && (
-          <Button text="Alterar" onPress={handleChangeRegister} />
-        )}
-        <PaddingBotton />
-      </Scroll>
+          <Input
+            type="picker"
+            label={'Categoria:'}
+            value={category.value}
+            error={!!error}
+            onValueChange={(itemValue, index) =>
+              handleChangePickers('category', index)
+            }
+            pickerList={categories}
+          />
+
+          <Input
+            type="picker"
+            label={'Sub Categoria:'}
+            value={subCategory.value}
+            error={!!error}
+            onValueChange={(itemValue, index) =>
+              handleChangePickers('sub-category', index)
+            }
+            pickerList={subCategories}
+          />
+
+          <Input
+            type="datePicker"
+            label={'Data:'}
+            datePickerValue={transaction.date}
+            onChangeDate={(date) =>
+              setTransaction((current) => ({...current, date}))
+            }
+          />
+
+          {paymentForm.type === 'CREDITO' && (
+            <Input
+              type="datePicker"
+              label={'Data do Pagamento:'}
+              datePickerValue={transaction.paymentDate}
+              onChangeDate={(paymentDate) =>
+                setTransaction((current) => ({...current, paymentDate}))
+              }
+            />
+          )}
+
+          {!transactionId && (
+            <Button text="Cadastrar" onPress={handleAddRegister} />
+          )}
+
+          {!!transactionId && (
+            <Button text="Alterar" onPress={handleChangeRegister} />
+          )}
+
+          <PaddingBotton />
+        </Scroll>
+      )}
     </Container>
   );
 };

@@ -92,20 +92,36 @@ const TransactionsList: React.FC = () => {
         description,
         date,
         paymentDate,
+        type,
       } = transaction;
       const paymentMode = getRegisterRecord('payment-modes', payment_form_id);
       const category = getRegisterRecord('categories', category_id);
       const subCatgegory = getRegisterRecord('sub-categories', sub_category_id);
       return {
-        unSelected: [description, formatValue(value)],
+        unSelected: [
+          description,
+          (type === 'outcome' ? '-' : '+') + formatValue(value),
+        ],
         selected: [
           description,
-          formatValue(value),
-          paymentMode,
-          category,
-          subCatgegory,
-          (date && format(date, 'dd/MM/yyyy')) || '  /  /  ',
-          (paymentDate && format(paymentDate, 'dd/MM/yyyy')) || '  /  /  ',
+          formatValue(value) +
+            (type === 'outcome' ? ' <- ' : ' -> ') +
+            paymentMode,
+          // '',
+          // 'Forma de Pagamento',
+          // paymentMode,
+          '',
+          // 'Categoria - Sub Categoria',
+          category + ' - ' + subCatgegory,
+          // '',
+          // 'Sub Categoria',
+          // subCatgegory,
+          '',
+          (date && 'Data da Transação') || '',
+          (date && format(date, 'dd/MM/yyyy')) || '',
+          '',
+          (paymentDate && 'Data de Pagamento') || '',
+          (paymentDate && format(paymentDate, 'dd/MM/yyyy')) || '',
         ],
       };
     });
@@ -117,6 +133,11 @@ const TransactionsList: React.FC = () => {
         {transactions.map((transaction, index) => {
           return (
             <ListItem
+              style={{
+                backgroundColor:
+                  transaction.type === 'outcome' ? '#F00' : '#0F0',
+                elevation: 4,
+              }}
               key={transaction.id}
               text={
                 selectedTransactionId !== transaction.id

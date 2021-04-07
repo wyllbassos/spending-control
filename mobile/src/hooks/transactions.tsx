@@ -16,8 +16,10 @@ export interface Transaction {
   payment_form_id: string;
   category_id: string;
   sub_category_id: string;
-  date?: Date;
+  date: Date;
   paymentDate?: Date;
+  type: 'income' | 'outcome';
+  payment_form_id_for_transfer?: string;
 }
 
 export interface TransactionsContextProps {
