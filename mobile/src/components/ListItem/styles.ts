@@ -15,6 +15,7 @@ export const Container = styled.TouchableOpacity<ContainerProps>`
   background-color: ${({backgroundColor}) => backgroundColor};
   margin: 8px 16px;
   border-radius: 2px;
+  elevation: 4;
 `;
 
 export const Text = styled.Text<TextProps>`

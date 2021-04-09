@@ -12,7 +12,15 @@ import ListItem from '../../components/ListItem';
 
 import {Container} from '../../styles';
 
-import {ListTansactionsContainer, Icon, ListBottonSpace} from './styles';
+import {
+  ListTansactionsContainer,
+  Icon,
+  ListBottonSpace,
+  TextItem,
+  TextContainer,
+  ValueContainer,
+  IconValue,
+} from './styles';
 import {Register, RegisterKeys} from '../../hooks/registers';
 
 const TransactionsList: React.FC = () => {
@@ -97,32 +105,33 @@ const TransactionsList: React.FC = () => {
       const paymentMode = getRegisterRecord('payment-modes', payment_form_id);
       const category = getRegisterRecord('categories', category_id);
       const subCatgegory = getRegisterRecord('sub-categories', sub_category_id);
+
+      let unSelected = '';
+      unSelected = description;
+      unSelected += `\n${type === 'outcome' ? '-' : '+'} `;
+      unSelected += formatValue(value);
+
+      let selected = '';
+      selected += `\n${paymentMode}`;
+      selected += `\n\n${category} - ${subCatgegory}`;
+
+      if (date) {
+        selected += `\n\nDATA DA TRANSAÇÃO`;
+        selected += `\n${format(date, 'dd/MM/yyyy')}`;
+      }
+
+      if (paymentDate) {
+        selected += `\n\nDATA DE PAGAMENTO`;
+        selected += `\n${format(paymentDate, 'dd/MM/yyyy')}`;
+      }
+
       return {
-        unSelected: [
-          description,
-          (type === 'outcome' ? '-' : '+') + formatValue(value),
-        ],
-        selected: [
-          description,
-          formatValue(value) +
-            (type === 'outcome' ? ' <- ' : ' -> ') +
-            paymentMode,
-          // '',
-          // 'Forma de Pagamento',
-          // paymentMode,
-          '',
-          // 'Categoria - Sub Categoria',
-          category + ' - ' + subCatgegory,
-          // '',
-          // 'Sub Categoria',
-          // subCatgegory,
-          '',
-          (date && 'Data da Transação') || '',
-          (date && format(date, 'dd/MM/yyyy')) || '',
-          '',
-          (paymentDate && 'Data de Pagamento') || '',
-          (paymentDate && format(paymentDate, 'dd/MM/yyyy')) || '',
-        ],
+        arrowIcon: type === 'outcome' ? 'arrow-down-circle' : 'arrow-up-circle',
+        credit: paymentMode.search('CREDITO') >= 0,
+        color: type === 'outcome' ? '#e83f5b' : '#12a454',
+        value: formatValue(value),
+
+        selected,
       };
     });
   }, [transactions]);
@@ -133,17 +142,11 @@ const TransactionsList: React.FC = () => {
         {transactions.map((transaction, index) => {
           return (
             <ListItem
-              style={{
-                backgroundColor:
-                  transaction.type === 'outcome' ? '#F00' : '#0F0',
-                elevation: 4,
-              }}
+              // style={{
+              //   backgroundColor:
+              //     transaction.type === 'outcome' ? '#e83f5b' : '#12a454',
+              // }}
               key={transaction.id}
-              text={
-                selectedTransactionId !== transaction.id
-                  ? textsForListItems[index].unSelected
-                  : textsForListItems[index].selected
-              }
               onPress={() =>
                 setSelectedTransactionId(
                   selectedTransactionId !== transaction.id
@@ -156,8 +159,33 @@ const TransactionsList: React.FC = () => {
               }}
               buttonEdit={{
                 onPress: () => handleSelectTransaction(transaction.id),
-              }}
-            />
+              }}>
+              <TextContainer>
+                <ValueContainer>
+                  <IconValue
+                    name={textsForListItems[index].arrowIcon}
+                    size={24}
+                    color={textsForListItems[index].color}
+                  />
+                  <TextItem color={textsForListItems[index].color}>
+                    {textsForListItems[index].value}
+                  </TextItem>
+                  {textsForListItems[index].credit && (
+                    <IconValue
+                      name="credit-card"
+                      size={16}
+                      color={textsForListItems[index].color}
+                    />
+                  )}
+                </ValueContainer>
+
+                <TextItem>{transaction.description}</TextItem>
+
+                {selectedTransactionId === transaction.id && (
+                  <TextItem>{textsForListItems[index].selected}</TextItem>
+                )}
+              </TextContainer>
+            </ListItem>
           );
         })}
         <ListBottonSpace />
