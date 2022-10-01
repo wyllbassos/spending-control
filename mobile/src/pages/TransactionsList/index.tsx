@@ -36,7 +36,7 @@ const TransactionsList: React.FC = () => {
 
   const {registers} = useRegisters();
 
-  const paymentForms = useMemo(() => registers['payment-modes'], [registers]);
+  const accounts = useMemo(() => registers['accounts'], [registers]);
   const categories = useMemo(() => registers['categories'], [registers]);
   const subCategories = useMemo(() => registers['sub-categories'], [registers]);
 
@@ -74,61 +74,58 @@ const TransactionsList: React.FC = () => {
     [transactions],
   );
 
-  const getRegisterRecord = useCallback(
-    (registerKey: RegisterKeys, id): string => {
+  const getRegisterDescription = useCallback(
+    (registerKey: RegisterKeys, id): Register | undefined => {
       const register = registers[registerKey].find((item) => item.id === id);
       if (register) {
-        if (registerKey === 'payment-modes') {
-          return `${register.value}${
-            register.type ? ` - ${register.type}` : ''
-          }`;
-        }
-        return register.value;
+        return register;
       }
-      return '';
+      return undefined;
     },
-    [paymentForms, categories, subCategories],
+    [accounts, categories, subCategories],
   );
 
   const textsForListItems = useMemo(() => {
     return transactions.map((transaction) => {
       const {
         category_id,
-        payment_form_id,
+        origin_account_id,
+        destination_account_id,
         sub_category_id,
         value,
         description,
-        date,
-        paymentDate,
-        type,
+        transaction_date,
+        execution_date,
       } = transaction;
-      const paymentMode = getRegisterRecord('payment-modes', payment_form_id);
-      const category = getRegisterRecord('categories', category_id);
-      const subCatgegory = getRegisterRecord('sub-categories', sub_category_id);
+      const originAccount = getRegisterDescription('accounts', origin_account_id);
+      const destinationAccount = getRegisterDescription('accounts', destination_account_id);
+      const category = getRegisterDescription('categories', category_id);
+      const subCatgegory = getRegisterDescription('sub-categories', sub_category_id);
 
       let unSelected = '';
       unSelected = description;
-      unSelected += `\n${type === 'outcome' ? '-' : '+'} `;
+      // TODO criar campo para setar que a conta é minha
+      unSelected += `\n${destinationAccount?.type !== 'ENTRADA/SAIDA' ? '-' : '+'} `;
       unSelected += formatValue(value);
 
       let selected = '';
-      selected += `\n${paymentMode}`;
-      selected += `\n\n${category} - ${subCatgegory}`;
+      selected += `\n${originAccount?.value} -> ${destinationAccount?.value}`;
+      selected += `\n\n${category ? category.value : ''} - ${subCatgegory ? subCatgegory.value : ''}`;
 
-      if (date) {
+      if (transaction_date) {
         selected += `\n\nDATA DA TRANSAÇÃO`;
-        selected += `\n${format(date, 'dd/MM/yyyy')}`;
+        selected += `\n${format(transaction_date, 'dd/MM/yyyy')}`;
       }
 
-      if (paymentDate) {
+      if (execution_date) {
         selected += `\n\nDATA DE PAGAMENTO`;
-        selected += `\n${format(paymentDate, 'dd/MM/yyyy')}`;
+        selected += `\n${format(execution_date, 'dd/MM/yyyy')}`;
       }
 
       return {
-        arrowIcon: type === 'outcome' ? 'arrow-down-circle' : 'arrow-up-circle',
-        credit: paymentMode.search('CREDITO') >= 0,
-        color: type === 'outcome' ? '#e83f5b' : '#12a454',
+        arrowIcon: destinationAccount?.type !== 'ENTRADA/SAIDA' ? 'arrow-down-circle' : 'arrow-up-circle',
+        credit: destinationAccount?.type !== 'ENTRADA/SAIDA',
+        color: 'outcome' ? '#e83f5b' : '#12a454',
         value: formatValue(value),
 
         selected,

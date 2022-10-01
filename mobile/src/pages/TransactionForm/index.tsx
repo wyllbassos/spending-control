@@ -37,29 +37,28 @@ const TransactionForm: React.FC = () => {
     id: '',
     description: '',
     value: 0,
-    payment_form_id: '',
+    origin_account_id: '',
+    destination_account_id: '',
     category_id: '',
     sub_category_id: '',
-    type: 'income',
-    date: new Date(),
+    transaction_date: new Date(),
   });
 
   const [value, setValue] = useState('');
-  const [paymentForm, setPaymentForm] = useState<Register>({id: '', value: ''});
+  const [originAccount, setOriginAccount] = useState<Register>({id: '', value: ''});
+  const [destinationAccount, setDestinationAccount] = useState<Register>({id: '', value: ''});
   const [category, setCategory] = useState<Register>({id: '', value: ''});
   const [subCategory, setSubCategory] = useState<Register>({id: '', value: ''});
   // const [description, setDescription] = useState('');
   const [error, setError] = useState<string>();
 
   const [income, setIncome] = useState<number>();
-  const [transactionType, setTransactionType] = useState<
-    'Entrada' | 'Saída' | 'Transferência'
-  >();
 
   const {registers} = useRegisters();
   const {transactions, addTransaction, changeTransaction} = useTransactions();
 
-  const paymentForms = useMemo(() => registers['payment-modes'], [registers]);
+  const originAccounts = useMemo(() => registers['accounts'].filter(({type}) => !type ? [] : type.search('SAIDA')>=0), [registers]);
+  const destinationAccounts = useMemo(() => registers['accounts'].filter(({type}) => !type ? [] : type.search('ENTRADA')>=0), [registers]);  
   const categories = useMemo(() => registers['categories'], [registers]);
   const subCategories = useMemo(() => registers['sub-categories'], [registers]);
 
@@ -69,10 +68,15 @@ const TransactionForm: React.FC = () => {
         (item) => item.id === transactionId,
       );
       if (selectedTransaction) {
-        const paymentFormEdit = paymentForms.find(
-          (item) => item.id === selectedTransaction.payment_form_id,
+        const originAccountEdit = originAccounts.find(
+          (item) => item.id === selectedTransaction.origin_account_id,
         );
-        if (paymentFormEdit) setPaymentForm(paymentFormEdit);
+        if (originAccountEdit) setOriginAccount(originAccountEdit);
+
+        const destinationAccountEdit = destinationAccounts.find(
+          (item) => item.id === selectedTransaction.destination_account_id,
+        );
+        if (destinationAccountEdit) setDestinationAccount(destinationAccountEdit);
 
         const categoryEdit = categories.find(
           (item) => item.id === selectedTransaction.category_id,
@@ -91,13 +95,15 @@ const TransactionForm: React.FC = () => {
       }
     }
 
-    if (paymentForms.length) setPaymentForm(paymentForms[0]);
+    if (originAccounts.length) setOriginAccount(originAccounts[0]);
+    if (destinationAccounts.length) setDestinationAccount(destinationAccounts[0]);
     if (categories.length) setCategory(categories[0]);
     if (subCategories.length) setSubCategory(subCategories[0]);
 
     setTransaction((current) => ({
       ...current,
-      payment_form_id: (paymentForms[0] && paymentForms[0].id) || '',
+      origin_account_id: (originAccounts[0] && originAccounts[0].id) || '',
+      destination_account_id: (destinationAccounts[0] && destinationAccounts[0].id) || '',
       category_id: (categories[0] && categories[0].id) || '',
       sub_category_id: (subCategories[0] && subCategories[0].id) || '',
     }));
@@ -134,7 +140,7 @@ const TransactionForm: React.FC = () => {
     if (!transaction.value) {
       errorText += 'Valor\n';
     }
-    if (!transaction.payment_form_id) {
+    if (!transaction.origin_account_id) {
       errorText += 'Forma de Pagamento\n';
     }
     if (!transaction.category_id) {
@@ -143,10 +149,10 @@ const TransactionForm: React.FC = () => {
     if (!transaction.sub_category_id) {
       errorText += 'Sub Categoria\n';
     }
-    if (!transaction.date) {
+    if (!transaction.transaction_date) {
       errorText += 'Data\n';
     }
-    if (!transaction.paymentDate && paymentForm.type === 'CREDITO') {
+    if (!transaction.execution_date && originAccount.type === 'SAIDA') {
       errorText += 'Data de Pagamento\n';
     }
 
@@ -175,13 +181,25 @@ const TransactionForm: React.FC = () => {
 
   const handleChangePickers = useCallback(
     (picker, idPicker: number) => {
-      if (picker === 'payment-form') {
-        const paymantForm = paymentForms[idPicker];
-        if (paymantForm) {
-          setPaymentForm(paymantForm);
+      if (picker === 'origin_account') {
+        const newOriginAccount = originAccounts[idPicker];
+        if (newOriginAccount) {
+          setOriginAccount(newOriginAccount);
           setTransaction((current) => ({
             ...current,
-            payment_form_id: paymantForm.id,
+            origin_account_id: newOriginAccount.id,
+          }));
+        }
+        return;
+      }
+
+      if (picker === 'destination_account') {
+        const newDestinationAccount = destinationAccounts[idPicker];
+        if (newDestinationAccount) {
+          setOriginAccount(newDestinationAccount);
+          setTransaction((current) => ({
+            ...current,
+            destination_account_id: newDestinationAccount.id,
           }));
         }
         return;
@@ -211,15 +229,12 @@ const TransactionForm: React.FC = () => {
         return;
       }
     },
-    [paymentForms, categories, subCategories],
+    [originAccounts, destinationAccounts, categories, subCategories],
   );
 
-  const handleSetTransactionType = useCallback(
-    (newTransactionType: 'Entrada' | 'Saída' | 'Transferência') => {
-      setTransactionType(newTransactionType);
+  const handleSetTransactionType = useCallback(() => {
       setTransaction((current) => ({
         ...current,
-        type: newTransactionType === 'Saída' ? 'outcome' : 'income',
       }));
     },
     [],
@@ -227,116 +242,104 @@ const TransactionForm: React.FC = () => {
 
   return (
     <Container backgroundColor={tercearyColor}>
-      {transactionType === undefined && (
-        <>
-          <Button
-            text="Saída"
-            onPress={() => handleSetTransactionType('Saída')}
-          />
+      <Scroll>
+        <PaymentTypeText color={primaryColor}>
+          {!!transaction.value ? formatValue(transaction.value) : 'R$ 0,00'}
+          {/* {transactionType === 'Entrada' ? ' -> ' : ' <- '} */}
+          {`${originAccount.value} - ${destinationAccount.type}`}
+        </PaymentTypeText>
 
-          <Button
-            text="Entrada"
-            onPress={() => handleSetTransactionType('Entrada')}
-          />
+        <Input
+          label={'Descrição:'}
+          value={transaction.description}
+          error={!!error}
+          onChangeText={(description) => {
+            setTransaction((current) => ({...current, description}));
+          }}
+        />
 
-          <Button
-            text="Transferência"
-            onPress={() => handleSetTransactionType('Transferência')}
-          />
-        </>
-      )}
-      {transactionType !== undefined && (
-        <Scroll>
-          <PaymentTypeText color={primaryColor}>
-            {!!transaction.value ? formatValue(transaction.value) : 'R$ 0,00'}
-            {transactionType === 'Entrada' ? ' -> ' : ' <- '}
-            {`${paymentForm.value} - ${paymentForm.type}`}
-          </PaymentTypeText>
+        <Input
+          label={'Valor:'}
+          value={value}
+          error={!!error}
+          onChangeText={handleChangeValue}
+          keyboardType="numeric"
+        />
 
-          <Input
-            label={'Descrição:'}
-            value={transaction.description}
-            error={!!error}
-            onChangeText={(description) => {
-              setTransaction((current) => ({...current, description}));
-            }}
-          />
+        <Input
+          type="picker"
+          label={'Conta origem:'}
+          value={originAccount.value}
+          error={!!error}
+          onValueChange={(itemValue, index) =>
+            handleChangePickers('account', index)
+          }
+          pickerList={originAccounts}
+        />
 
-          <Input
-            label={'Valor:'}
-            value={value}
-            error={!!error}
-            onChangeText={handleChangeValue}
-            keyboardType="numeric"
-          />
+        <Input
+          type="picker"
+          label={'Conta destino:'}
+          value={destinationAccount.value}
+          error={!!error}
+          onValueChange={(itemValue, index) =>
+            handleChangePickers('account', index)
+          }
+          pickerList={destinationAccounts}
+        />
 
-          <Input
-            type="picker"
-            label={'Forma de Pagamento:'}
-            value={`${paymentForm.value} - ${paymentForm.type}`}
-            error={!!error}
-            onValueChange={(itemValue, index) =>
-              handleChangePickers('payment-form', index)
-            }
-            pickerList={paymentForms.map((paymentFormMap) => ({
-              ...paymentFormMap,
-              value: `${paymentFormMap.value} - ${paymentFormMap.type}`,
-            }))}
-          />
+        <Input
+          type="picker"
+          label={'Categoria:'}
+          value={category.value}
+          error={!!error}
+          onValueChange={(itemValue, index) =>
+            handleChangePickers('category', index)
+          }
+          pickerList={categories}
+        />
 
-          <Input
-            type="picker"
-            label={'Categoria:'}
-            value={category.value}
-            error={!!error}
-            onValueChange={(itemValue, index) =>
-              handleChangePickers('category', index)
-            }
-            pickerList={categories}
-          />
+        <Input
+          type="picker"
+          label={'Sub Categoria:'}
+          value={subCategory.value}
+          error={!!error}
+          onValueChange={(itemValue, index) =>
+            handleChangePickers('sub-category', index)
+          }
+          pickerList={subCategories}
+        />
 
-          <Input
-            type="picker"
-            label={'Sub Categoria:'}
-            value={subCategory.value}
-            error={!!error}
-            onValueChange={(itemValue, index) =>
-              handleChangePickers('sub-category', index)
-            }
-            pickerList={subCategories}
-          />
+        <Input
+          type="datePicker"
+          label={'Data:'}
+          datePickerValue={transaction.transaction_date}
+          onChangeDate={(date) =>
+            setTransaction((current) => ({...current, date}))
+          }
+        />
 
+        {originAccount.type === 'SAIDA' && (
           <Input
             type="datePicker"
-            label={'Data:'}
-            datePickerValue={transaction.date}
-            onChangeDate={(date) =>
-              setTransaction((current) => ({...current, date}))
+            label={'Data do Pagamento:'}
+            datePickerValue={transaction.execution_date}
+            onChangeDate={(execution_date) =>
+              setTransaction((current) => ({...current, execution_date}))
             }
           />
+        )}
 
-          {paymentForm.type === 'CREDITO' && (
-            <Input
-              type="datePicker"
-              label={'Data do Pagamento:'}
-              datePickerValue={transaction.paymentDate}
-              onChangeDate={(paymentDate) =>
-                setTransaction((current) => ({...current, paymentDate}))
-              }
-            />
-          )}
+        {!transactionId && (
+          <Button text="Cadastrar" onPress={handleAddRegister} />
+        )}
 
-          {!transactionId && (
-            <Button text="Cadastrar" onPress={handleAddRegister} />
-          )}
+        {!!transactionId && (
+          <Button text="Alterar" onPress={handleChangeRegister} />
+        )}
 
-          {!!transactionId && (
-            <Button text="Alterar" onPress={handleChangeRegister} />
-          )}
-
-          <PaddingBotton />
-        </Scroll>
-      )}
+        <PaddingBotton />
+      </Scroll>
     </Container>
   );
 };

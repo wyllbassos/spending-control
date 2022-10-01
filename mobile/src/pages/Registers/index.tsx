@@ -28,8 +28,8 @@ const Dashboard: React.FC = () => {
       backgroundColor={tercearyColor}
       style={{paddingHorizontal: 16, paddingVertical: 8}}>
       <Button
-        text="Formas de Pagamentos"
-        onPress={() => handleRegister('payment-modes')}
+        text="Contas"
+        onPress={() => handleRegister('accounts')}
       />
 
       <Button text="Categorias" onPress={() => handleRegister('categories')} />

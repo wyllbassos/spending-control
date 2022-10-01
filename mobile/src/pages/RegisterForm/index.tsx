@@ -29,10 +29,6 @@ const RegisterForm: React.FC = () => {
     theme: {primaryColor, secundaryColor, tercearyColor},
   } = useThemes();
 
-  const [inputValue, setInputValue] = useState('');
-  const [typeValue, setTypeValue] = useState<'CREDITO' | 'DEBITO'>();
-  const [error, setError] = useState<string>();
-
   const {
     addRegister,
     changeRegister,
@@ -40,6 +36,10 @@ const RegisterForm: React.FC = () => {
     selectedRegister,
     registerDescriptions,
   } = useRegisters();
+
+  const [inputValue, setInputValue] = useState('');
+  const [typeValue, setTypeValue] = useState<'ENTRADA/SAIDA' | 'SAIDA' | 'ENTRADA' | undefined>(selectedRegister === 'accounts' ? 'ENTRADA/SAIDA' : undefined);
+  const [error, setError] = useState<string>();
 
   useEffect(() => {
     navigation.setOptions({
@@ -62,7 +62,8 @@ const RegisterForm: React.FC = () => {
 
       if (selectedRegister) {
         setInputValue(selectedRegister.value);
-        setTypeValue(selectedRegister.type);
+        if (selectedRegister.type !== undefined)
+          setTypeValue(selectedRegister.type);
       }
       return registerId;
     }
@@ -77,7 +78,7 @@ const RegisterForm: React.FC = () => {
       return false;
     }
 
-    if (selectedRegister === 'payment-modes' && !typeValue) {
+    if (selectedRegister === 'accounts' && typeValue === undefined) {
       const errorText = 'Tipo deve ser preenchido.';
       Alert.alert('Erro ao Cadastrar', errorText);
       setError(errorText);
@@ -133,7 +134,7 @@ const RegisterForm: React.FC = () => {
         onChangeText={setInputValue}
       />
 
-      {selectedRegister === 'payment-modes' && (
+      {typeValue && (
         <Input
           type="picker"
           label={'Tipo:'}
@@ -141,9 +142,9 @@ const RegisterForm: React.FC = () => {
           error={!!error}
           onValueChange={setTypeValue}
           pickerList={[
-            {value: '', id: '0'},
-            {value: 'CREDITO', id: '1'},
-            {value: 'DEBITO', id: '2'},
+            {value: 'ENTRADA/SAIDA', id: '0'},
+            {value: 'ENTRADA', id: '1'},
+            {value: 'SAIDA', id: '2'},
           ]}
         />
       )}

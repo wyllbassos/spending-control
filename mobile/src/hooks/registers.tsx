@@ -10,16 +10,16 @@ import React, {
 import AsyncStorage from '@react-native-community/async-storage';
 import {Alert} from 'react-native';
 
-export type RegisterKeys = 'payment-modes' | 'categories' | 'sub-categories';
+export type RegisterKeys = 'accounts' | 'categories' | 'sub-categories';
 
 export interface Register {
   id: string;
   value: string;
-  type?: 'CREDITO' | 'DEBITO';
+  type?: 'ENTRADA/SAIDA' | 'SAIDA' | 'ENTRADA';
 }
 
 export interface Registers {
-  'payment-modes': Register[];
+  'accounts': Register[];
   categories: Register[];
   'sub-categories': Register[];
 }
@@ -43,11 +43,11 @@ export const RegistersContext = createContext<RegistersContextProps | null>(
 
 const RegistersProvider: React.FC = ({children}) => {
   const [selectedRegister, setSelectedRegister] = useState<RegisterKeys>(
-    'payment-modes',
+    'accounts',
   );
 
   const [registers, setRegisters] = useState<Registers>({
-    'payment-modes': [],
+    'accounts': [],
     categories: [],
     'sub-categories': [],
   });
@@ -64,8 +64,8 @@ const RegistersProvider: React.FC = ({children}) => {
     () =>
       selectedRegister === 'categories'
         ? {singular: 'Categoria', plural: 'Categorias'}
-        : selectedRegister === 'payment-modes'
-        ? {singular: 'Forma de Pagamento', plural: 'Formas de Pagamento'}
+        : selectedRegister === 'accounts'
+        ? {singular: 'Conta', plural: 'Contas'}
         : {singular: 'Sub Categoria', plural: 'Sub Categorias'},
     [selectedRegister],
   );

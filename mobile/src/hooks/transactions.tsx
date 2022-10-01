@@ -13,13 +13,12 @@ export interface Transaction {
   id: string;
   description: string;
   value: number;
-  payment_form_id: string;
+  origin_account_id: string;
+  destination_account_id: string;
   category_id: string;
   sub_category_id: string;
-  date: Date;
-  paymentDate?: Date;
-  type: 'income' | 'outcome';
-  payment_form_id_for_transfer?: string;
+  transaction_date: Date;
+  execution_date?: Date;
 }
 
 export interface TransactionsContextProps {
@@ -42,14 +41,14 @@ const TransactionsProvider: React.FC = ({children}) => {
         if (storageTransactions) {
           const loadTransactions: Transaction[] = JSON.parse(
             storageTransactions,
-          ).map((loadTransaction: Transaction) => {
-            const {value, date, paymentDate} = loadTransaction;
+          ).map((loadTransaction: Transaction): Transaction => {
+            const {value, transaction_date, execution_date} = loadTransaction;
             return {
               ...loadTransaction,
               value: !value ? 0 : Number(value),
-              date: date ? new Date(date) : undefined,
-              paymentDate: paymentDate ? new Date(paymentDate) : undefined,
-            } as Transaction;
+              transaction_date: transaction_date ? new Date(transaction_date) : new Date(),
+              execution_date: execution_date ? new Date(execution_date) : undefined,
+            };
           });
           setTransactions([...loadTransactions]);
         }
