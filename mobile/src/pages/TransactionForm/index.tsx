@@ -55,8 +55,8 @@ const TransactionForm: React.FC = () => {
   const {accounts} = useAccounts();
   const {transactions, addTransaction, changeTransaction} = useTransactions();
 
-  const originAccounts = useMemo(() => accounts.filter(({type}) => type.search('SAIDA') >= 0), [accounts]);
-  const destinationAccounts = useMemo(() => accounts.filter(({type}) => type.search('ENTRADA') >= 0), [accounts]);
+  const originAccounts = useMemo(() => accounts.filter(({type}) => type.search('ENTRADA') >= 0), [accounts]);
+  const destinationAccounts = useMemo(() => accounts.filter(({type}) => type.search('SAIDA') >= 0), [accounts]);
   const categories = useMemo(() => registers['categories'], [registers]);
   const subCategories = useMemo(() => registers['sub-categories'], [registers]);
 
@@ -243,7 +243,6 @@ const TransactionForm: React.FC = () => {
       <Scroll>
         <PaymentTypeText color={primaryColor}>
           {!!transaction.value ? formatValue(transaction.value) : 'R$ 0,00'}
-          {/* {transactionType === 'Entrada' ? ' -> ' : ' <- '} */}
           {`${originAccount.value} - ${destinationAccount.type}`}
         </PaymentTypeText>
 

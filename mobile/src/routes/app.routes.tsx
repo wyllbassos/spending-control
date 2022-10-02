@@ -150,36 +150,11 @@ const AppRoutes: React.FC = () => {
   );
 
   return (
-    <>
-      {/* <App.Navigator initialRouteName="Dashboard">
-        {appScreens.map((screen) => (
-          <App.Screen
-            key={screen.key}
-            options={{
-              headerStyle: {
-                backgroundColor: primaryColor,
-              },
-              headerTintColor: !!screen.key ? secundaryColor : undefined,
-              headerTitle: !!screen.key
-                ? screen.headerTitle
-                : () => (
-                    <Logo
-                      secundaryColor={secundaryColor}
-                      tercearyColor={tercearyColor}
-                    />
-                  ),
-            }}
-            name={screen.name}
-            component={screen.component}
-          />
-        ))}
-      </App.Navigator> */}
-      <Tab.Navigator>
-        <Tab.Screen name="Transactions" component={NavigatorTransactions} />
-        <Tab.Screen name="Registers" component={NavigatorRegisters} />
-        <Tab.Screen name="Temas" component={NavigatorThemes} />
-      </Tab.Navigator>
-    </>
+    <Tab.Navigator screenOptions={{headerShown: false}}>
+      <Tab.Screen name="Transactions" component={NavigatorTransactions} />
+      <Tab.Screen name="Registers" component={NavigatorRegisters} />
+      <Tab.Screen name="Temas" component={NavigatorThemes} />
+    </Tab.Navigator>
   );
 };
 
