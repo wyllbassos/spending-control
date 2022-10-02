@@ -106,11 +106,8 @@ const TransactionsList: React.FC = () => {
       const category = getRegisterDescription('categories', category_id);
       const subCatgegory = getRegisterDescription('sub-categories', sub_category_id);
 
-      let unSelected = '';
-      unSelected = description;
-      // TODO criar campo para setar que a conta é minha
-      unSelected += `\n${destinationAccount?.type !== 'ENTRADA/SAIDA' ? '-' : '+'} `;
-      unSelected += formatValue(value);
+      const isOutcome = destinationAccount?.type === 'SAIDA';
+      const isIncome = !isOutcome && originAccount?.type === 'ENTRADA'
 
       let selected = '';
       selected += `\n${originAccount?.value} -> ${destinationAccount?.value}`;
@@ -127,9 +124,17 @@ const TransactionsList: React.FC = () => {
       }
 
       return {
-        arrowIcon: destinationAccount?.type !== 'ENTRADA/SAIDA' ? 'arrow-down-circle' : 'arrow-up-circle',
-        credit: destinationAccount?.type !== 'ENTRADA/SAIDA',
-        color: 'outcome' ? '#e83f5b' : '#12a454',
+        arrowIcon: isOutcome
+          ? 'arrow-down'
+          :  isIncome
+           ? 'arrow-up'
+           : 'repeat',
+        credit: isOutcome,
+        color: isOutcome
+          ? '#e83f5b'
+          : isIncome
+            ? '#12a454'
+            :  'gray',
         value: formatValue(value),
 
         selected,
