@@ -1,0 +1,3 @@
+yarn add @react-native-async-storage/async-storage @react-native-community/datetimepicker @react-native-picker/picker @react-navigation/bottom-tabs @react-navigation/native @react-navigation/stack date-fns styled-components styled-components-react-native  react-native-vector-icons react-native-svg react-native-safe-area-context react-native-screens
+
+yarn add -D @types/react @types/react-native-vector-icons @types/styled-components @types/styled-components-react-native

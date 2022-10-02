@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useMemo} from 'react';
-import { StackNavigationProp } from '@react-navigation/stack';
+import {StackNavigationProp} from '@react-navigation/stack';
 import {useNavigation} from '@react-navigation/native';
 import Icons from 'react-native-vector-icons/Feather';
 import Button from '../../components/Button';
@@ -10,7 +10,7 @@ import {Container} from '../../styles';
 import {ListRecordContainer, ListBottonSpace} from './styles';
 
 import {Alert} from 'react-native';
-import { RootStackParamList } from 'src/types';
+import {RootStackParamList} from '../../types';
 
 const RegisterList: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
@@ -19,26 +19,24 @@ const RegisterList: React.FC = () => {
     theme: {secundaryColor, tercearyColor},
   } = useThemes();
 
-  const {
-    registers,
-    selectedRegister,
-    removeRegister,
-    registerDescriptions,
-  } = useRegisters();
+  const {registers, selectedRegister, removeRegister, registerDescriptions} =
+    useRegisters();
 
   const {accounts, removeAccount} = useAccounts();
 
   const list = useMemo(() => {
-    if (selectedRegister === 'accounts') return accounts;
+    if (selectedRegister === 'accounts') {
+      return accounts;
+    }
 
-    return registers[selectedRegister]
+    return registers[selectedRegister];
   }, [accounts, registers, selectedRegister]);
 
   useEffect(() => {
     navigation.setOptions({
       headerTitle: registerDescriptions.plural,
     });
-  }, []);
+  }, [navigation, registerDescriptions]);
 
   const handleSelectRegister = useCallback(
     (registerId: string) => {
@@ -49,11 +47,13 @@ const RegisterList: React.FC = () => {
 
   const handleDeleteRegister = useCallback(
     (id: string) => {
-      const registerValue = list.find((register) => register.id === id)?.value;
+      const registerValue = list.find(register => register.id === id)?.value;
 
       Alert.alert(
         'Atenção',
-        registerValue ? `Deseja deletar o registro ${registerValue}` : 'Erro registro nao encontrado',
+        registerValue
+          ? `Deseja deletar o registro ${registerValue}`
+          : 'Erro registro nao encontrado',
         [
           {
             text: 'Cancelar',
@@ -61,10 +61,11 @@ const RegisterList: React.FC = () => {
           {
             text: 'Sim',
             onPress: async () => {
-              if (selectedRegister === 'accounts')
+              if (selectedRegister === 'accounts') {
                 await removeAccount(id);
-              else
+              } else {
                 await removeRegister(id);
+              }
             },
           },
         ],
@@ -74,7 +75,7 @@ const RegisterList: React.FC = () => {
         },
       );
     },
-    [selectedRegister, list],
+    [selectedRegister, list, removeAccount, removeRegister],
   );
 
   return (

@@ -1,4 +1,4 @@
-import { StackNavigationProp } from '@react-navigation/stack';
+import {StackNavigationProp} from '@react-navigation/stack';
 import {useNavigation} from '@react-navigation/native';
 import React, {useCallback} from 'react';
 import Button from '../../components/Button';
@@ -6,7 +6,7 @@ import {RegisterKeys} from '../../hooks/registers';
 import {useRegisters, useThemes} from '../../hooks';
 
 import {Container} from '../../styles';
-import { RootStackParamList } from 'src/types';
+import {RootStackParamList} from '../../types';
 
 const Dashboard: React.FC = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
@@ -22,17 +22,14 @@ const Dashboard: React.FC = () => {
       setSelectedRegister(register);
       navigation.navigate('Register-list', {});
     },
-    [navigation],
+    [navigation, setSelectedRegister],
   );
 
   return (
     <Container
       backgroundColor={tercearyColor}
       style={{paddingHorizontal: 16, paddingVertical: 8}}>
-      <Button
-        text="Contas"
-        onPress={() => handleRegister('accounts')}
-      />
+      <Button text="Contas" onPress={() => handleRegister('accounts')} />
 
       <Button text="Categorias" onPress={() => handleRegister('categories')} />
 
