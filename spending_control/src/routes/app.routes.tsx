@@ -150,7 +150,7 @@ const AppRoutes: React.FC = () => {
   );
 
   return (
-    <Tab.Navigator>
+    <Tab.Navigator screenOptions={{headerShown: false}}>
       <Tab.Screen key="Transactions" name="Transações" component={NavigatorTransactions} />
       <Tab.Screen key="Registers" name="Cadastros" component={NavigatorRegisters} />
       <Tab.Screen key="Temes" name="Temas" component={NavigatorThemes} />
