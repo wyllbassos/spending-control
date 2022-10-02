@@ -4,7 +4,7 @@ import Icons from 'react-native-vector-icons/Feather';
 import Button from '../../components/Button';
 import ListItem from '../../components/ListItem';
 
-import {useRegisters, useThemes} from '../../hooks';
+import {useAccounts, useRegisters, useThemes} from '../../hooks';
 import {Container} from '../../styles';
 import {ListRecordContainer, ListBottonSpace} from './styles';
 
@@ -24,10 +24,13 @@ const RegisterList: React.FC = () => {
     registerDescriptions,
   } = useRegisters();
 
-  const list = useMemo(() => registers[selectedRegister], [
-    registers,
-    selectedRegister,
-  ]);
+  const {accounts, removeAccount} = useAccounts();
+
+  const list = useMemo(() => {
+    if (selectedRegister === 'accounts') return accounts;
+
+    return registers[selectedRegister]
+  }, [accounts, registers, selectedRegister]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -44,11 +47,11 @@ const RegisterList: React.FC = () => {
 
   const handleDeleteRegister = useCallback(
     (id) => {
-      const index = list.findIndex((register) => register.id === id);
+      const registerValue = list.find((register) => register.id === id)?.value;
 
       Alert.alert(
         'Atenção',
-        `Deseja deletar o registro ${list[index].value}`,
+        registerValue ? `Deseja deletar o registro ${registerValue}` : 'Erro registro nao encontrado',
         [
           {
             text: 'Cancelar',
@@ -56,7 +59,10 @@ const RegisterList: React.FC = () => {
           {
             text: 'Sim',
             onPress: async () => {
-              await removeRegister(id);
+              if (selectedRegister === 'accounts')
+                await removeAccount(id);
+              else
+                await removeRegister(id);
             },
           },
         ],

@@ -12,14 +12,17 @@ import TransactionsProvider, {
 } from './transactions';
 
 import ThemesProvider, {ThemesContext, ThemesContextProps} from './themes';
+import AccountsProvider, { AccountsContext, AccountsContextProps } from './accounts';
 
 const AppProvider: React.FC = ({children}) => {
   return (
     <ThemesProvider>
       <RegistersProvider>
-        <TransactionsProvider>
-          <NavigationContainer>{children}</NavigationContainer>
-        </TransactionsProvider>
+        <AccountsProvider>
+          <TransactionsProvider>
+            <NavigationContainer>{children}</NavigationContainer>
+          </TransactionsProvider>
+        </AccountsProvider>
       </RegistersProvider>
     </ThemesProvider>
   );
@@ -27,6 +30,18 @@ const AppProvider: React.FC = ({children}) => {
 
 export const useTransactions = (): TransactionsContextProps => {
   const context = useContext(TransactionsContext);
+
+  if (!context) {
+    throw new Error(
+      `useTransactions must be used within a TransactionsProvider`,
+    );
+  }
+
+  return context;
+};
+
+export const useAccounts = (): AccountsContextProps => {
+  const context = useContext(AccountsContext);
 
   if (!context) {
     throw new Error(

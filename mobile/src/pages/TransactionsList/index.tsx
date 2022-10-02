@@ -4,7 +4,7 @@ import {useNavigation} from '@react-navigation/native';
 
 import {format} from 'date-fns';
 
-import {useRegisters, useThemes, useTransactions} from '../../hooks';
+import {useAccounts, useRegisters, useThemes, useTransactions} from '../../hooks';
 import formatValue from '../../utils/formatValue';
 
 import Button from '../../components/Button';
@@ -35,8 +35,8 @@ const TransactionsList: React.FC = () => {
   const {transactions, removeTransaction} = useTransactions();
 
   const {registers} = useRegisters();
+  const {accounts} = useAccounts();
 
-  const accounts = useMemo(() => registers['accounts'], [registers]);
   const categories = useMemo(() => registers['categories'], [registers]);
   const subCategories = useMemo(() => registers['sub-categories'], [registers]);
 
@@ -76,14 +76,16 @@ const TransactionsList: React.FC = () => {
 
   const getRegisterDescription = useCallback(
     (registerKey: RegisterKeys, id): Register | undefined => {
-      const register = registers[registerKey].find((item) => item.id === id);
-      if (register) {
-        return register;
+      let register: Register | undefined;
+
+      if (registerKey == 'accounts') {
+        register = accounts.find((item) => item.id === id);
+      } else {
+        register = registers[registerKey].find((item) => item.id === id);
       }
-      return undefined;
-    },
-    [accounts, categories, subCategories],
-  );
+
+      return register;
+    }, [accounts, registers]);
 
   const textsForListItems = useMemo(() => {
     return transactions.map((transaction) => {

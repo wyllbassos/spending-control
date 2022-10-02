@@ -2,9 +2,7 @@ import React, {
   createContext,
   useState,
   useCallback,
-  useContext,
   useEffect,
-  useMemo,
 } from 'react';
 
 import AsyncStorage from '@react-native-community/async-storage';
@@ -74,12 +72,6 @@ const defautThemes: ThemeProps[] = [
 ];
 
 const ThemesProvider: React.FC = ({children}) => {
-  const [theme, setTheme] = useState<ThemeProps>({
-    id: '0',
-    primaryColor: '#FFF',
-    secundaryColor: '#FFF',
-    tercearyColor: '#FFF',
-  });
   const [themes, setThemes] = useState<ThemeProps[]>(defautThemes);
   const [selectedTheme, setSelectedTheme] = useState(0);
 
@@ -89,12 +81,8 @@ const ThemesProvider: React.FC = ({children}) => {
         const {storageSelectedTheme, storageThemes} = JSON.parse(
           storageThemesStr,
         ) as ThemesStorageProps;
-        console.log(
-          storageSelectedTheme,
-          storageThemes[Number(storageSelectedTheme)],
-        );
+
         setSelectedTheme(Number(storageSelectedTheme));
-        setTheme({...storageThemes[Number(storageSelectedTheme)]});
         setThemes({...storageThemes});
       }
     });
@@ -196,17 +184,7 @@ const ThemesProvider: React.FC = ({children}) => {
 
   const handleChangeTheme = useCallback(
     async (index: number): Promise<void> => {
-      // const index = themes.findIndex((theme) => theme.id === id);
-
-      // console.log(id, index);
-
-      // if (index < 0) {
-      //   Alert.alert('Tema Não Localizado');
-      //   return;
-      // }
       setSelectedTheme(index);
-      console.log({...themes[index]});
-      setTheme({...themes[index]});
 
       await AsyncStorage.setItem(
         'gofinances@themes',
@@ -221,7 +199,7 @@ const ThemesProvider: React.FC = ({children}) => {
 
   const value: ThemesContextProps = React.useMemo(
     () => ({
-      theme,
+      theme: themes[selectedTheme],
       themes,
       addTheme,
       changeTheme,

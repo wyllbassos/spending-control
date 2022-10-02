@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {Alert} from 'react-native';
-import {useRegisters, useThemes} from '../../hooks';
+import {useAccounts, useRegisters, useThemes} from '../../hooks';
 import {
   ParamListBase,
   RouteProp,
@@ -12,6 +12,8 @@ import Button from '../../components/Button';
 import Input from '../../components/Input';
 
 import {Container} from '../../styles';
+import { Register } from 'src/hooks/registers';
+import { AccountType } from 'src/hooks/accounts';
 
 interface RouteParams extends RouteProp<ParamListBase, string> {
   params: {
@@ -37,8 +39,15 @@ const RegisterForm: React.FC = () => {
     registerDescriptions,
   } = useRegisters();
 
-  const [inputValue, setInputValue] = useState('');
-  const [typeValue, setTypeValue] = useState<'ENTRADA/SAIDA' | 'SAIDA' | 'ENTRADA' | undefined>(selectedRegister === 'accounts' ? 'ENTRADA/SAIDA' : undefined);
+  const {accounts, addAccount, changeAccount} = useAccounts();
+
+  // const [inputValue, setInputValue] = useState('');
+  // const [typeValue, setTypeValue] = useState<'ENTRADA/SAIDA' | 'SAIDA' | 'ENTRADA' | undefined>(selectedRegister === 'accounts' ? 'ENTRADA/SAIDA' : undefined);
+  const [register, setRegister] = useState<Register>({
+    id: '',
+    value: '',
+    type: selectedRegister === 'accounts' ? 'ENTRADA/SAIDA' : undefined,
+  })
   const [error, setError] = useState<string>();
 
   useEffect(() => {
@@ -49,36 +58,49 @@ const RegisterForm: React.FC = () => {
 
   useEffect(() => {
     if (!!error) setError(undefined);
-  }, [inputValue, typeValue]);
+  }, [register]);
 
-  const list = useMemo(() => registers[selectedRegister], [
-    registers,
-    selectedRegister,
-  ]);
+  const list = useMemo(() => {
+    if (selectedRegister === 'accounts') return accounts;
 
-  const selectedRegisterRecordId = useMemo(() => {
+    return registers[selectedRegister]
+  }, [accounts, registers, selectedRegister]);
+
+  useEffect(() => {
     if (registerId) {
-      const selectedRegister = list.find((item) => item.id === registerId);
+      const register = list.find(r => r.id === registerId);
 
-      if (selectedRegister) {
-        setInputValue(selectedRegister.value);
-        if (selectedRegister.type !== undefined)
-          setTypeValue(selectedRegister.type);
+      if (register) {
+        setRegister(register);
       }
-      return registerId;
     }
-    return undefined;
-  }, [registerId]);
+  }, [registerId, list]);
+
+  // const selectedRegisterRecordId = useMemo(() => {
+  //   if (registerId) {
+  //     const register = list.find(r => r.id === registerId);
+
+  //     if (register) {
+  //       // setInputValue(register.value);
+  //       // if (register.type !== undefined)
+  //       //   setTypeValue(register.type);
+  //     }
+
+  //     return register;
+  //   }
+  //   return undefined;
+  // }, [registerId]);
 
   const handleCheckInputValue = useCallback(() => {
-    if (!inputValue) {
+    const {value, type} = register;
+    if (!value) {
       const errorText = 'Nome deve ser preenchido.';
       Alert.alert('Erro ao Cadastrar', errorText);
       setError(errorText);
       return false;
     }
 
-    if (selectedRegister === 'accounts' && typeValue === undefined) {
+    if (selectedRegister === 'accounts' && type === undefined) {
       const errorText = 'Tipo deve ser preenchido.';
       Alert.alert('Erro ao Cadastrar', errorText);
       setError(errorText);
@@ -86,42 +108,59 @@ const RegisterForm: React.FC = () => {
     }
 
     return true;
-  }, [inputValue, typeValue, selectedRegister]);
+  }, [register, selectedRegister]);
 
   const handleAddRegister = useCallback(async () => {
     if (!handleCheckInputValue()) {
       return;
     }
 
-    const ok = await addRegister({value: inputValue, type: typeValue});
+    let ok = false;
+    if (selectedRegister === 'accounts')
+      if (register.type) {
+        ok = await addAccount({
+          value: register.value,
+          type: register.type,
+        });
+      } else {
+        Alert.alert('Tipo nao definido');
+      }
+    else
+      ok = await addRegister(register);
 
     if (ok) navigation.goBack();
-    else Alert.alert('erro ao incluir');
-  }, [handleCheckInputValue, addRegister, inputValue, typeValue, navigation]);
+    else Alert.alert('Erro ao incluir');
+  }, [handleCheckInputValue, addRegister, register, navigation, selectedRegister]);
 
   const handleChangeRegister = useCallback(async () => {
     if (!handleCheckInputValue()) {
       return;
     }
 
-    if (!selectedRegisterRecordId) {
+    if (register.id === '') {
       Alert.alert('Não Selecionado Registro para Alterar');
       return;
     }
 
-    const ok = await changeRegister({
-      id: selectedRegisterRecordId,
-      value: inputValue,
-      type: typeValue,
-    });
+    let ok = false;
+    if (selectedRegister === 'accounts')
+      if (register.type)
+        ok = await changeAccount({
+          ...register,
+          type: register.type,
+        });
+      else
+        Alert.alert('Tipo nao definido');
+    else
+      ok = await changeRegister(register);
 
     if (ok) navigation.goBack();
     else Alert.alert('erro ao alterar');
   }, [
     handleCheckInputValue,
-    selectedRegisterRecordId,
+    selectedRegister,
     changeRegister,
-    inputValue,
+    register,
     navigation,
   ]);
 
@@ -129,18 +168,19 @@ const RegisterForm: React.FC = () => {
     <Container backgroundColor={tercearyColor} style={{padding: 16}}>
       <Input
         label={`Nome da ${registerDescriptions.singular}:`}
-        value={inputValue}
+        value={register.value}
         error={!!error}
-        onChangeText={setInputValue}
+        onChangeText={value => setRegister(s => ({...s, value}))}
       />
 
-      {typeValue && (
+      {selectedRegister === 'accounts' && (
         <Input
           type="picker"
           label={'Tipo:'}
-          value={typeValue}
+          value={register.type}
           error={!!error}
-          onValueChange={setTypeValue}
+          onValueChange={(type: AccountType) => setRegister(s => ({...s, type}))}
+          // onChangeText={(type: AccountType) => setRegister(s => ({...s, type}))}
           pickerList={[
             {value: 'ENTRADA/SAIDA', id: '0'},
             {value: 'ENTRADA', id: '1'},
@@ -149,11 +189,11 @@ const RegisterForm: React.FC = () => {
         />
       )}
 
-      {!selectedRegisterRecordId && (
+      {register.id === '' && (
         <Button text="Cadastrar" onPress={handleAddRegister} />
       )}
 
-      {!!selectedRegisterRecordId && (
+      {register.id !== '' && (
         <Button text="Alterar" onPress={handleChangeRegister} />
       )}
     </Container>

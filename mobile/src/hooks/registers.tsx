@@ -9,13 +9,14 @@ import React, {
 
 import AsyncStorage from '@react-native-community/async-storage';
 import {Alert} from 'react-native';
+import { AccountType } from './accounts';
 
 export type RegisterKeys = 'accounts' | 'categories' | 'sub-categories';
 
 export interface Register {
   id: string;
   value: string;
-  type?: 'ENTRADA/SAIDA' | 'SAIDA' | 'ENTRADA';
+  type?: AccountType;
 }
 
 export interface Registers {

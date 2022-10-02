@@ -7,7 +7,7 @@ import {
   useRoute,
 } from '@react-navigation/native';
 
-import {useRegisters, useThemes, useTransactions} from '../../hooks';
+import {useAccounts, useRegisters, useThemes, useTransactions} from '../../hooks';
 import {Transaction} from 'src/hooks/transactions';
 
 import Button from '../../components/Button';
@@ -49,16 +49,14 @@ const TransactionForm: React.FC = () => {
   const [destinationAccount, setDestinationAccount] = useState<Register>({id: '', value: ''});
   const [category, setCategory] = useState<Register>({id: '', value: ''});
   const [subCategory, setSubCategory] = useState<Register>({id: '', value: ''});
-  // const [description, setDescription] = useState('');
   const [error, setError] = useState<string>();
 
-  const [income, setIncome] = useState<number>();
-
   const {registers} = useRegisters();
+  const {accounts} = useAccounts();
   const {transactions, addTransaction, changeTransaction} = useTransactions();
 
-  const originAccounts = useMemo(() => registers['accounts'].filter(({type}) => !type ? [] : type.search('SAIDA')>=0), [registers]);
-  const destinationAccounts = useMemo(() => registers['accounts'].filter(({type}) => !type ? [] : type.search('ENTRADA')>=0), [registers]);  
+  const originAccounts = useMemo(() => accounts.filter(({type}) => type.search('SAIDA') >= 0), [accounts]);
+  const destinationAccounts = useMemo(() => accounts.filter(({type}) => type.search('ENTRADA') >= 0), [accounts]);
   const categories = useMemo(() => registers['categories'], [registers]);
   const subCategories = useMemo(() => registers['sub-categories'], [registers]);
 
@@ -196,7 +194,7 @@ const TransactionForm: React.FC = () => {
       if (picker === 'destination_account') {
         const newDestinationAccount = destinationAccounts[idPicker];
         if (newDestinationAccount) {
-          setOriginAccount(newDestinationAccount);
+          setDestinationAccount(newDestinationAccount);
           setTransaction((current) => ({
             ...current,
             destination_account_id: newDestinationAccount.id,
@@ -272,7 +270,7 @@ const TransactionForm: React.FC = () => {
           value={originAccount.value}
           error={!!error}
           onValueChange={(itemValue, index) =>
-            handleChangePickers('account', index)
+            handleChangePickers('origin_account', index)
           }
           pickerList={originAccounts}
         />
@@ -283,7 +281,7 @@ const TransactionForm: React.FC = () => {
           value={destinationAccount.value}
           error={!!error}
           onValueChange={(itemValue, index) =>
-            handleChangePickers('account', index)
+            handleChangePickers('destination_account', index)
           }
           pickerList={destinationAccounts}
         />
