@@ -11,6 +11,11 @@ import Category from './Category';
 import SubCategory from './SubCategory';
 import PaymentMode from './PaymentMode';
 
+export enum EnumTransactionType {
+  INCOME = 'income',
+  OUTCOME = 'outcome',
+}
+
 @Entity('transactions')
 class Transaction {
   @PrimaryGeneratedColumn('uuid')
@@ -25,8 +30,8 @@ class Transaction {
   @Column()
   title: string;
 
-  @Column('enum')
-  type: 'income' | 'outcome';
+  @Column('enum', { nullable: false, enum: EnumTransactionType })
+  type: EnumTransactionType;
 
   @Column('decimal')
   value: number;
