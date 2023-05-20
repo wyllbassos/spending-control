@@ -9,7 +9,7 @@ import registers from './registers.routes';
 const routes = Router();
 
 routes.get('/health-check', async (_: Request, response: Response) => {
-  return response.json('ok');
+  return response.json('OK');
 });
 
 routes.use('/transactions', transactionsRouter);
