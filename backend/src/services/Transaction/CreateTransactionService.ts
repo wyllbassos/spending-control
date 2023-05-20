@@ -3,16 +3,16 @@ import { getRepository } from 'typeorm';
 import AppError from '../../errors/AppError';
 // import Category from '../../models/Category';
 
-import Transaction from '../../models/Transaction';
+import Transaction, { EnumTransactionType } from '../../models/Transaction';
 
 import CreateCategoryService from '../Category/CreateCategoryService';
 import CreatePaymentModeService from '../PaymentMode/CreatePaymentModeService';
 import CreateSubCategoryService from '../SubCategory/CreateSubCategoryService';
 
-interface Request {
+export interface TransactionCreate {
   title: string;
   value: number;
-  type: 'income' | 'outcome';
+  type: EnumTransactionType;
   category: string;
   subCategory: string;
   paymentMode: string;
@@ -46,7 +46,7 @@ function checkParms({
   installment_number,
   installment_total,
   executed,
-}: Request): void {
+}: TransactionCreate): void {
   if (!value) {
     throw new AppError(`The value field cannot be null or 0`);
   }
@@ -98,7 +98,7 @@ function checkParms({
 }
 
 class CreateTransactionService {
-  public async execute(request: Request): Promise<Transaction> {
+  public async execute(request: TransactionCreate): Promise<Transaction> {
     checkParms(request);
 
     const {

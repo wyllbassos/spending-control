@@ -7,17 +7,12 @@ import AppError from '../../errors/AppError';
 
 import Transaction from '../../models/Transaction';
 
-import CreateTransactionService from './CreateTransactionService';
+import CreateTransactionService, {
+  TransactionCreate,
+} from './CreateTransactionService';
 
 interface Request {
   importFilename: string;
-}
-
-interface TransactionCreate {
-  title: string;
-  value: number;
-  type: 'income' | 'outcome';
-  category: string;
 }
 
 const propsTransactionCreate = ['title', 'type', 'value', 'category'];
@@ -39,9 +34,16 @@ async function loadCSV(filePath: string): Promise<TransactionCreate[]> {
   parseCSV.on('data', line => {
     const transaction: TransactionCreate = {
       title: line[propsTransactionImportOrder.title],
-      category: line[propsTransactionImportOrder.category],
-      type: line[propsTransactionImportOrder.type],
       value: line[propsTransactionImportOrder.value],
+      type: line[propsTransactionImportOrder.type],
+      category: line[propsTransactionImportOrder.category],
+      subCategory: line[propsTransactionImportOrder.subCategory],
+      paymentMode: line[propsTransactionImportOrder.paymentMode],
+      date: line[propsTransactionImportOrder.date],
+      payment_date: line[propsTransactionImportOrder.payment_date],
+      installment_number: line[propsTransactionImportOrder.installment_number],
+      installment_total: line[propsTransactionImportOrder.installment_total],
+      executed: line[propsTransactionImportOrder.executed],
     };
     transactions.push(transaction);
   });
