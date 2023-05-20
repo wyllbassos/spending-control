@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Request, Response, Router } from 'express';
 
 import transactionsRouter from './transactions.routes';
 import categoriesRouter from './categories.routes';
@@ -7,6 +7,10 @@ import paymentModesRouter from './paymentModes.routes';
 import registers from './registers.routes';
 
 const routes = Router();
+
+routes.get('/health-check', async (_: Request, response: Response) => {
+  return response.json('OK');
+});
 
 routes.use('/transactions', transactionsRouter);
 routes.use('/categories', categoriesRouter);
